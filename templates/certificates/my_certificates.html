@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Certificates{% endblock %}
+
+{% block nav_certificates %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-award text-warning mr-2"></i>
+            My Certificates
+        </h1>
+        <div class="d-none d-lg-inline-block">
+            <span class="text-muted">
+                <i class="fas fa-info-circle mr-1"></i>
+                Earn certificates by completing courses with 80%+ quiz scores
+            </span>
+        </div>
+    </div>
+
+    <!-- Certificates Overview -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Certificates
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ certificates.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-certificate fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Valid Certificates
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% for cert in certificates %}
+                                    {% if cert.is_valid %}{{ forloop.counter0|add:1 }}{% endif %}
+                                {% empty %}0{% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Latest Certificate
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if certificates %}
+                                    {{ certificates.first.issued_date|date:"M d, Y" }}
+                                {% else %}
+                                    None
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificates List -->
+    {% if certificates %}
+        <div class="row">
+            {% for certificate in certificates %}
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card shadow border-left-{% if certificate.is_valid %}success{% else %}warning{% endif %} h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                {{ certificate.course.title|truncatechars:30 }}
+                            </h6>
+                        </div>
+                        <div>
+                            {% if certificate.is_valid %}
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Valid
+                                </span>
+                            {% else %}
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="certificate-preview mb-3">
+                            <div class="bg-gradient-primary text-white text-center py-4 rounded">
+                                <i class="fas fa-award fa-3x mb-2"></i>
+                                <h6 class="text-white mb-0">Certificate of Completion</h6>
+                                <small class="text-white-50">Risk Management Training</small>
+                            </div>
+                        </div>
+                        
+                        <div class="certificate-details">
+                            <div class="row mb-2">
+                                <div class="col-sm-5">
+                                    <small class="text-muted">Certificate #:</small>
+                                </div>
+                                <div class="col-sm-7">
+                                    <small class="font-weight-bold">{{ certificate.certificate_number }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-sm-5">
+                                    <small class="text-muted">Issued Date:</small>
+                                </div>
+                                <div class="col-sm-7">
+                                    <small>{{ certificate.issued_date|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-sm-5">
+                                    <small class="text-muted">Expiry Date:</small>
+                                </div>
+                                <div class="col-sm-7">
+                                    <small>
+                                        {% if certificate.expiry_date %}
+                                            {{ certificate.expiry_date|date:"M d, Y" }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-5">
+                                    <small class="text-muted">Final Score:</small>
+                                </div>
+                                <div class="col-sm-7">
+                                    <span class="badge badge-{% if certificate.overall_score >= 90 %}success{% elif certificate.overall_score >= 80 %}warning{% else %}danger{% endif %}">
+                                        {{ certificate.overall_score|floatformat:1 }}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="certificate-actions">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{% url 'certificates:detail' certificate.id %}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    View
+                                </a>
+                                {% if certificate.is_valid %}
+                                    <a href="{% url 'certificates:download' certificate.id %}" 
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fas fa-download mr-1"></i>
+                                        Download
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination (if needed) -->
+        {% if certificates.has_other_pages %}
+        <nav aria-label="Certificates pagination">
+            <ul class="pagination justify-content-center">
+                {% if certificates.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ certificates.previous_page_number }}">&laquo; Previous</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in certificates.paginator.page_range %}
+                    {% if certificates.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if certificates.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ certificates.next_page_number }}">Next &raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- No Certificates Message -->
+        <div class="card shadow">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-award fa-5x text-gray-300"></i>
+                </div>
+                <h4 class="text-gray-600 mb-3">No Certificates Yet</h4>
+                <p class="text-gray-500 mb-4">
+                    Complete courses with a quiz score of 80% or higher to earn certificates.
+                    Certificates recognize your achievement in Risk Management training.
+                </p>
+                
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    How to Earn Certificates
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <ol class="mb-0 text-left">
+                                    <li class="mb-2">
+                                        <strong>Enroll in a Course:</strong>
+                                        <span class="text-muted">Choose from available risk management courses</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <strong>Complete All Videos:</strong>
+                                        <span class="text-muted">Watch 95% of each video (no skipping allowed)</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <strong>Pass the Quiz:</strong>
+                                        <span class="text-muted">Score 80% or higher on the course assessment</span>
+                                    </li>
+                                    <li class="mb-0">
+                                        <strong>Get Certified:</strong>
+                                        <span class="text-muted">Receive your certificate with QR verification</span>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'courses:dashboard' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-book mr-2"></i>
+                        Browse Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.certificate-preview {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.certificate-actions .btn {
+    border-radius: 0;
+}
+
+.certificate-actions .btn:first-child {
+    border-top-left-radius: 0.35rem;
+    border-bottom-left-radius: 0.35rem;
+}
+
+.certificate-actions .btn:last-child {
+    border-top-right-radius: 0.35rem;
+    border-bottom-right-radius: 0.35rem;
+}
+
+.card.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.card.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+</style>
+{% endblock %}

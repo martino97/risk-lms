@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Learning Progress - Risk LMS{% endblock %}
+
+{% block nav_progress %}active{% endblock %}
+
+{% block page_heading %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-chart-line text-primary"></i> My Learning Progress
+        </h1>
+        <p class="mb-0 text-gray-600">Track your risk training completion and performance</p>
+    </div>
+    <div class="btn-group">
+        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+            <i class="fas fa-book"></i> Browse Courses
+        </a>
+        <a href="{% url 'certificates:my_certificates' %}" class="btn btn-success">
+            <i class="fas fa-certificate"></i> My Certificates
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- Progress Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Enrolled Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_courses }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Completed Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ completed_courses }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Certificates Earned</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ certificates_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-award fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Videos Completed</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ completed_videos }} / {{ total_videos }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-video fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Overall Progress</div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ overall_progress|floatformat:0 }}%</div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-warning" role="progressbar" 
+                                             style="width: {{ overall_progress }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-pie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Progress Details -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-list-alt"></i> Course Progress
+                    </h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{% url 'courses:course_list' %}">
+                                <i class="fas fa-plus"></i> Enroll in More Courses
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'certificates:my_certificates' %}">
+                                <i class="fas fa-download"></i> Download Certificates
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if progress_data %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Progress</th>
+                                        <th>Last Activity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for progress in progress_data %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="mr-3">
+                                                    <div class="icon-circle bg-primary">
+                                                        <i class="fas fa-graduation-cap text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="font-weight-bold">{{ progress.course.title }}</div>
+                                                    <small class="text-muted">{{ progress.course.description|truncatewords:8 }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="mr-2">{{ progress.video_progress|floatformat:0 }}%</span>
+                                                <div class="progress flex-grow-1" style="height: 8px;">
+                                                    <div class="progress-bar 
+                                                        {% if progress.video_progress >= 80 %}bg-success
+                                                        {% elif progress.video_progress >= 50 %}bg-warning
+                                                        {% else %}bg-info{% endif %}"
+                                                         role="progressbar" 
+                                                         style="width: {{ progress.video_progress }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ progress.enrollment.enrolled_date|date:"M j, Y" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if progress.video_progress >= 100 %}
+                                                <span class="badge badge-success">Completed</span>
+                                            {% elif progress.video_progress > 0 %}
+                                                <span class="badge badge-warning">In Progress</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">Not Started</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'courses:course_detail' progress.course.id %}" 
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-play"></i> Continue
+                                                </a>
+                                                {% if progress.video_progress >= 100 %}
+                                                <a href="{% url 'certificates:my_certificates' %}" 
+                                                   class="btn btn-outline-success btn-sm">
+                                                    <i class="fas fa-certificate"></i> Certificate
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-5x text-gray-300 mb-3"></i>
+                            <h4 class="text-gray-600">No Progress Yet</h4>
+                            <p class="text-muted">Start learning by enrolling in your first course</p>
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-book"></i> Browse Available Courses
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Activity -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="fas fa-calendar-alt"></i> Recent Activity
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% if recent_activity %}
+                            {% for activity in recent_activity %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker 
+                                    {% if activity.activity_type == 'course_completed' %}bg-success
+                                    {% elif activity.activity_type == 'video_watched' %}bg-info
+                                    {% elif activity.activity_type == 'quiz_passed' %}bg-warning
+                                    {% else %}bg-primary{% endif %}">
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <small class="text-muted">{{ activity.created_at|date:"M j, g:i A" }}</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        <strong>
+                                            {% if activity.activity_type == 'course_completed' %}
+                                                <i class="fas fa-graduation-cap"></i> Course Completed
+                                            {% elif activity.activity_type == 'video_watched' %}
+                                                <i class="fas fa-play-circle"></i> Video Watched
+                                            {% elif activity.activity_type == 'quiz_passed' %}
+                                                <i class="fas fa-check-circle"></i> Quiz Passed
+                                            {% else %}
+                                                <i class="fas fa-book"></i> Course Activity
+                                            {% endif %}
+                                        </strong>
+                                    </p>
+                                    <small class="text-muted">{{ activity.description }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-history fa-3x text-gray-300 mb-2"></i>
+                                <p class="text-muted">No recent activity</p>
+                                <small class="text-muted">Start a course to see your learning activity here</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-chart-bar"></i> Learning Stats
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 border-right">
+                            <div class="h5 mb-0 font-weight-bold text-primary">{{ total_study_time|default:"0" }}</div>
+                            <div class="text-xs text-gray-500 text-uppercase">Hours Studied</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 mb-0 font-weight-bold text-success">{{ quiz_scores_avg|floatformat:0|default:"0" }}%</div>
+                            <div class="text-xs text-gray-500 text-uppercase">Avg Quiz Score</div>
+                        </div>
+                    </div>
+                    <hr class="my-3">
+                    <div class="row text-center">
+                        <div class="col-6 border-right">
+                            <div class="h5 mb-0 font-weight-bold text-warning">{{ videos_watched|default:"0" }}</div>
+                            <div class="text-xs text-gray-500 text-uppercase">Videos Watched</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 mb-0 font-weight-bold text-info">{{ quizzes_passed|default:"0" }}</div>
+                            <div class="text-xs text-gray-500 text-uppercase">Quizzes Passed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: #e3e6f0;
+}
+
+.timeline-item:last-child:before {
+    display: none;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -16px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #e3e6f0;
+}
+
+.timeline-content {
+    background: #f8f9fc;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid #4e73df;
+}
+
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-sm {
+    height: 8px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz - {% if quiz_attempt.interactive_course %}{{ quiz_attempt.interactive_course.title }}{% else %}{{ quiz_attempt.course.title }}{% endif %}{% endblock %}
+
+{% block nav_courses %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Quiz Header -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-clipboard-check mr-2"></i>
+                            {% if quiz_attempt.interactive_course %}Interactive Module{% else %}Course{% endif %} Assessment
+                        </h6>
+                    </div>
+                    <div>
+                        <span class="badge badge-info badge-lg">
+                            {{ questions.count }} Questions
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="text-primary mb-2">{% if quiz_attempt.interactive_course %}{{ quiz_attempt.interactive_course.title }}{% else %}{{ quiz_attempt.course.title }}{% endif %}</h5>
+                            <p class="text-muted mb-0">{% if quiz_attempt.interactive_course %}{{ quiz_attempt.interactive_course.description|default:"Interactive learning module"|truncatewords:20 }}{% else %}{{ quiz_attempt.course.description|truncatewords:20 }}{% endif %}</p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <div class="quiz-timer">
+                                <i class="fas fa-clock text-warning"></i>
+                                <span class="font-weight-bold">No Time Limit</span>
+                            </div>
+                            <small class="text-muted d-block mt-1">Take your time to answer carefully</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Form -->
+    <form id="quizForm" method="post" action="{% url 'quizzes:submit' quiz_attempt.id %}">
+        {% csrf_token %}
+        
+        {% for question in questions %}
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                Question {{ forloop.counter }}
+                            </h6>
+                            <div>
+                                <span class="badge badge-secondary">{{ question.difficulty|capfirst }}</span>
+                                {% if question.topic %}
+                                    <span class="badge badge-info">{{ question.topic }}</span>
+                                {% endif %}
+                                <span class="badge badge-success">{{ question.points }} point{{ question.points|pluralize }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Question Text -->
+                        <div class="mb-4">
+                            <p class="lead">{{ question.question_text }}</p>
+                        </div>
+                        
+                        <!-- Answer Options -->
+                        <div class="answer-options">
+                            {% if question.question_type == 'multiple_choice' or question.question_type == 'true_false' %}
+                                {% for option in question.options.all %}
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" 
+                                           type="radio" 
+                                           name="question_{{ question.id }}" 
+                                           id="option_{{ option.id }}" 
+                                           value="{{ option.id }}"
+                                           required>
+                                    <label class="form-check-label" for="option_{{ option.id }}">
+                                        <span class="option-letter">
+                                            {% if forloop.counter == 1 %}A.{% elif forloop.counter == 2 %}B.{% elif forloop.counter == 3 %}C.{% elif forloop.counter == 4 %}D.{% elif forloop.counter == 5 %}E.{% elif forloop.counter == 6 %}F.{% else %}{{ forloop.counter }}.{% endif %}
+                                        </span>
+                                        {{ option.option_text }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            {% elif question.question_type == 'multiple_answer' %}
+                                {% for option in question.options.all %}
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           name="question_{{ question.id }}" 
+                                           id="option_{{ option.id }}" 
+                                           value="{{ option.id }}">
+                                    <label class="form-check-label" for="option_{{ option.id }}">
+                                        <span class="option-letter">
+                                            {% if forloop.counter == 1 %}A.{% elif forloop.counter == 2 %}B.{% elif forloop.counter == 3 %}C.{% elif forloop.counter == 4 %}D.{% elif forloop.counter == 5 %}E.{% elif forloop.counter == 6 %}F.{% else %}{{ forloop.counter }}.{% endif %}
+                                        </span>
+                                        {{ option.option_text }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- No Questions Available -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card shadow">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-question-circle fa-5x text-gray-300 mb-4"></i>
+                        <h4 class="text-gray-600">No Questions Available</h4>
+                        <p class="text-muted">There are no questions available for this {% if quiz_attempt.interactive_course %}module{% else %}course{% endif %} at the moment.</p>
+                        {% if quiz_attempt.interactive_course %}
+                        <a href="{% url 'content:play_interactive' quiz_attempt.interactive_course.course.id quiz_attempt.interactive_course.id %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Module
+                        </a>
+                        {% else %}
+                        <a href="{% url 'courses:course_detail' quiz_attempt.course.id %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Course
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% if questions %}
+        <!-- Submit Section -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card shadow border-left-primary">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-1">Ready to Submit?</h6>
+                                <small class="text-muted">
+                                    Make sure you've answered all questions before submitting.
+                                </small>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                {% if quiz_attempt.interactive_course %}
+                                <a href="{% url 'content:play_interactive' quiz_attempt.interactive_course.course.id quiz_attempt.interactive_course.id %}" 
+                                   class="btn btn-secondary mr-2">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                {% else %}
+                                <a href="{% url 'courses:course_detail' quiz_attempt.course.id %}" 
+                                   class="btn btn-secondary mr-2">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-check"></i> Submit Quiz
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.badge-lg {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.option-letter {
+    font-weight: bold;
+    color: #5a5c69;
+    margin-right: 0.5rem;
+}
+
+.form-check-label {
+    cursor: pointer;
+    padding-left: 0.5rem;
+}
+
+.form-check-input:checked ~ .form-check-label .option-letter {
+    color: #1cc88a;
+}
+
+.quiz-timer {
+    font-size: 1.1rem;
+}
+
+.answer-options {
+    background: #f8f9fc;
+    padding: 1.5rem;
+    border-radius: 0.35rem;
+    border: 1px solid #e3e6f0;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quiz form validation
+    const quizForm = document.getElementById('quizForm');
+    
+    if (quizForm) {
+        quizForm.addEventListener('submit', function(e) {
+            // Check if all required questions are answered
+            const requiredInputs = quizForm.querySelectorAll('input[type="radio"][required]');
+            let allAnswered = true;
+            
+            const questionGroups = new Set();
+            requiredInputs.forEach(input => {
+                questionGroups.add(input.name);
+            });
+            
+            questionGroups.forEach(groupName => {
+                const groupInputs = quizForm.querySelectorAll(`input[name="${groupName}"]`);
+                const isAnswered = Array.from(groupInputs).some(input => input.checked);
+                if (!isAnswered) {
+                    allAnswered = false;
+                }
+            });
+            
+            if (!allAnswered) {
+                e.preventDefault();
+                alert('Please answer all questions before submitting.');
+                return false;
+            }
+            
+            // Confirm submission
+            if (!confirm('Are you sure you want to submit your quiz? You cannot change your answers after submission.')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+    
+    // Auto-save functionality (optional)
+    const formInputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+    formInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Could implement auto-save here if needed
+            console.log('Answer selected:', this.name, this.value);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Interactive Course - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-laptop-code text-primary"></i> Upload Interactive Course
+        </h1>
+        <a href="{% url 'content:course_detail' course.id %}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+    </div>
+
+    <!-- Course Info -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-gradient-primary text-white">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fas fa-book-open"></i> {{ course.title }}
+            </h6>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-0">{{ course.description|truncatewords:30 }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Upload Form -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-file-archive"></i> Upload SCORM/Captivate Package
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        
+                        <!-- Content Type -->
+                        <div class="form-group">
+                            <label for="content_type" class="font-weight-bold">Content Type <span class="text-danger">*</span></label>
+                            <select name="content_type" id="content_type" class="form-control" required>
+                                <option value="captivate">Adobe Captivate</option>
+                                <option value="articulate">Articulate Storyline</option>
+                                <option value="scorm">SCORM Package</option>
+                                <option value="html5">HTML5 Course</option>
+                            </select>
+                            <small class="form-text text-muted">Select the type of interactive content you're uploading.</small>
+                        </div>
+                        
+                        <!-- Package File Upload -->
+                        <div class="form-group">
+                            <label for="package_file" class="font-weight-bold">Package File (ZIP) <span class="text-danger">*</span></label>
+                            <div class="custom-file">
+                                <input type="file" name="package_file" id="package_file" class="custom-file-input" 
+                                       accept=".zip" required>
+                                <label class="custom-file-label" for="package_file">Choose ZIP file...</label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Upload the exported ZIP package from Adobe Captivate, Articulate, or other authoring tools.
+                                Maximum file size: 500MB
+                            </small>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="progress mb-3" id="uploadProgress" style="display: none; height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                 role="progressbar" style="width: 0%;" id="progressBar">
+                                <span id="progressText">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="form-group">
+                            <label for="title" class="font-weight-bold">Course Title</label>
+                            <input type="text" name="title" id="title" class="form-control" 
+                                   placeholder="Leave blank to auto-detect from package">
+                            <small class="form-text text-muted">
+                                If left blank, the title will be extracted from the package metadata.
+                            </small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold">Description</label>
+                            <textarea name="description" id="description" class="form-control" rows="3"
+                                      placeholder="Describe the interactive course content..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <!-- Duration -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="duration_minutes" class="font-weight-bold">Duration (minutes)</label>
+                                    <input type="number" name="duration_minutes" id="duration_minutes" 
+                                           class="form-control" min="0" placeholder="Auto-detect">
+                                    <small class="form-text text-muted">Leave blank to auto-detect</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Total Slides -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="total_slides" class="font-weight-bold">Total Slides</label>
+                                    <input type="number" name="total_slides" id="total_slides" 
+                                           class="form-control" min="0" placeholder="Auto-detect">
+                                    <small class="form-text text-muted">Leave blank to auto-detect</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Order Index -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="order_index" class="font-weight-bold">Display Order</label>
+                                    <input type="number" name="order_index" id="order_index" 
+                                           class="form-control" min="0" value="{{ interactive_courses.count }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thumbnail -->
+                        <div class="form-group">
+                            <label for="thumbnail" class="font-weight-bold">Thumbnail Image (Optional)</label>
+                            <div class="custom-file">
+                                <input type="file" name="thumbnail" id="thumbnail" class="custom-file-input" 
+                                       accept="image/*">
+                                <label class="custom-file-label" for="thumbnail">Choose thumbnail image...</label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Upload a preview image for this course (recommended: 1280x720 or 16:9 ratio).
+                            </small>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Interactive Course
+                            </button>
+                            <a href="{% url 'content:video_upload' course.id %}" class="btn btn-outline-info btn-lg ml-2">
+                                <i class="fas fa-video"></i> Upload Regular Video Instead
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions & Existing Courses -->
+        <div class="col-lg-4">
+            <!-- Instructions Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-info-circle"></i> How to Prepare Your Package
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="font-weight-bold text-primary">Adobe Captivate:</h6>
+                    <ol class="small mb-3">
+                        <li>Open your Captivate project</li>
+                        <li>Go to <strong>File → Publish</strong></li>
+                        <li>Select <strong>HTML5/SWF</strong></li>
+                        <li>Check <strong>Zip Files</strong></li>
+                        <li>Click <strong>Publish</strong></li>
+                        <li>Upload the generated ZIP file</li>
+                    </ol>
+                    
+                    <h6 class="font-weight-bold text-success">Articulate Storyline:</h6>
+                    <ol class="small mb-3">
+                        <li>Open your Storyline project</li>
+                        <li>Click <strong>Publish</strong></li>
+                        <li>Choose <strong>Web</strong> or <strong>LMS</strong></li>
+                        <li>Enable <strong>Create zip</strong></li>
+                        <li>Click <strong>Publish</strong></li>
+                        <li>Upload the generated ZIP file</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning small mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Important:</strong> Ensure your package contains an <code>index.html</code> file as the entry point.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supported Formats -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-check-circle"></i> Supported Formats
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge badge-primary mr-2">
+                            <i class="fas fa-desktop"></i>
+                        </span>
+                        <span>Adobe Captivate (HTML5)</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge badge-success mr-2">
+                            <i class="fas fa-play-circle"></i>
+                        </span>
+                        <span>Articulate Storyline</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge badge-info mr-2">
+                            <i class="fas fa-graduation-cap"></i>
+                        </span>
+                        <span>SCORM 1.2 / 2004</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge badge-warning mr-2">
+                            <i class="fas fa-code"></i>
+                        </span>
+                        <span>HTML5 Courses</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Interactive Courses -->
+            {% if interactive_courses %}
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-laptop-code"></i> Existing Interactive Courses ({{ interactive_courses.count }})
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for ic in interactive_courses %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ ic.title|truncatewords:5 }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock"></i> {{ ic.get_duration_display }}
+                                        <i class="fas fa-layer-group ml-2"></i> {{ ic.total_slides }} slides
+                                    </small>
+                                </div>
+                                <span class="badge badge-{{ ic.content_type|default:'primary' }}">
+                                    {{ ic.get_content_type_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// File input label update
+document.querySelectorAll('.custom-file-input').forEach(function(input) {
+    input.addEventListener('change', function(e) {
+        var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file...';
+        var label = e.target.nextElementSibling;
+        label.textContent = fileName;
+        
+        // Show file size for package file
+        if (e.target.id === 'package_file' && e.target.files[0]) {
+            var fileSize = (e.target.files[0].size / (1024 * 1024)).toFixed(2);
+            label.textContent = fileName + ' (' + fileSize + ' MB)';
+        }
+    });
+});
+
+// Form submission with progress
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    var packageFile = document.getElementById('package_file').files[0];
+    
+    if (!packageFile) {
+        e.preventDefault();
+        alert('Please select a ZIP package file to upload.');
+        return;
+    }
+    
+    // Show progress bar
+    document.getElementById('uploadProgress').style.display = 'block';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    
+    // Simulate progress (actual progress tracking requires XMLHttpRequest)
+    var progress = 0;
+    var interval = setInterval(function() {
+        progress += Math.random() * 15;
+        if (progress > 90) progress = 90;
+        
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressText').textContent = Math.round(progress) + '%';
+    }, 500);
+    
+    // Store interval ID to clear later if needed
+    window.uploadInterval = interval;
+});
+</script>
+{% endblock %}

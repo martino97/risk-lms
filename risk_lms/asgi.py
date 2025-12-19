@@ -1,0 +1,8 @@
+"""
+ASGI config for risk_lms project.
+"""
+import os
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'risk_lms.settings')
+application = get_asgi_application()

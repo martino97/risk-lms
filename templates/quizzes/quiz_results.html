@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz Results - {% if quiz_attempt.interactive_course %}{{ quiz_attempt.interactive_course.title }}{% else %}{{ quiz_attempt.course.title }}{% endif %}{% endblock %}
+
+{% block nav_courses %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Results Header -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow border-left-{% if quiz_attempt.passed %}success{% else %}danger{% endif %}">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-{% if quiz_attempt.passed %}success{% else %}danger{% endif %}">
+                        <i class="fas fa-{% if quiz_attempt.passed %}check-circle{% else %}times-circle{% endif %} mr-2"></i>
+                        Quiz {% if quiz_attempt.passed %}Passed{% else %}Failed{% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 class="text-primary mb-2">{% if quiz_attempt.interactive_course %}{{ quiz_attempt.interactive_course.title }}{% else %}{{ quiz_attempt.course.title }}{% endif %}</h4>
+                            <p class="text-muted mb-3">{% if quiz_attempt.interactive_course %}Interactive Module{% else %}Course{% endif %} Assessment Results</p>
+                            
+                            {% if quiz_attempt.passed %}
+                                <div class="alert alert-success">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-trophy mr-2"></i>
+                                        Congratulations!
+                                    </h6>
+                                    <p class="mb-0">
+                                        You have successfully passed this {% if quiz_attempt.interactive_course %}module{% else %}course{% endif %} assessment. 
+                                        You can now proceed to get your certificate.
+                                    </p>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                        Keep Trying!
+                                    </h6>
+                                    <p class="mb-0">
+                                        You need at least 80% to pass. Review the course materials and try again.
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="score-display">
+                                <div class="score-circle {% if quiz_attempt.passed %}text-success{% else %}text-danger{% endif %} mb-3">
+                                    <h1 class="display-3 font-weight-bold mb-0">{{ quiz_attempt.score|floatformat:0 }}</h1>
+                                    <h5>out of 100</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Score Breakdown -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Questions
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ quiz_attempt.total_questions }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-question-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Correct Answers
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ quiz_attempt.correct_answers }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-{% if quiz_attempt.passed %}success{% else %}danger{% endif %} shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-{% if quiz_attempt.passed %}success{% else %}danger{% endif %} text-uppercase mb-1">
+                                Final Score
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ quiz_attempt.score|floatformat:0 }}%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-{% if quiz_attempt.passed %}trophy{% else %}times{% endif %} fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Time Taken
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if quiz_attempt.time_taken %}
+                                    {{ quiz_attempt.time_taken|floatformat:0 }} min
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-body text-center py-4">
+                    <h6 class="text-primary mb-3">What's Next?</h6>
+                    
+                    <div class="btn-group" role="group">
+                        {% if quiz_attempt.interactive_course %}
+                            <a href="{% url 'content:play_interactive' quiz_attempt.interactive_course.course.id quiz_attempt.interactive_course.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Module
+                            </a>
+                            
+                            {% if not quiz_attempt.passed %}
+                                <a href="{% url 'quizzes:start_interactive' quiz_attempt.interactive_course.id %}" class="btn btn-warning">
+                                    <i class="fas fa-redo mr-2"></i>
+                                    Retake Quiz
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'courses:course_detail' quiz_attempt.course.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Course
+                            </a>
+                            
+                            {% if not quiz_attempt.passed %}
+                                <a href="{% url 'quizzes:start' quiz_attempt.course.id %}" class="btn btn-warning">
+                                    <i class="fas fa-redo mr-2"></i>
+                                    Retake Quiz
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <a href="{% url 'courses:dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-home mr-2"></i>
+                            Dashboard
+                        </a>
+                        
+                        {% if quiz_attempt.passed %}
+                            {% if user_certificate %}
+                                <a href="{% url 'certificates:detail' user_certificate.id %}" class="btn btn-success">
+                                    <i class="fas fa-certificate mr-2"></i>
+                                    View Certificate
+                                </a>
+                                {% if user_certificate.pdf_file %}
+                                    <a href="{{ user_certificate.pdf_file.url }}" 
+                                       class="btn btn-outline-success" 
+                                       target="_blank" 
+                                       download="Certificate_{{ user_certificate.certificate_number }}.pdf">
+                                        <i class="fas fa-download mr-2"></i>
+                                        Download PDF
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'certificates:my_certificates' %}" class="btn btn-success">
+                                    <i class="fas fa-certificate mr-2"></i>
+                                    Check Certificates
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    {% if not quiz_attempt.passed %}
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                Tip: Review the course videos before retaking the quiz
+                            </small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.score-circle {
+    padding: 2rem;
+    border: 3px solid currentColor;
+    border-radius: 50%;
+    display: inline-block;
+    min-width: 150px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-group .btn {
+    margin: 0 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin: 0.25rem 0;
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

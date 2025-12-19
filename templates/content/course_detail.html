@@ -1,0 +1,538 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - Course Management{% endblock %}
+
+{% block page_heading %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-book text-primary"></i> {{ course.title }}
+        </h1>
+        <p class="mb-0 text-gray-600">Course Management & Content Overview</p>
+    </div>
+    <div class="btn-group">
+        <a href="{% url 'content:edit_course' course.id %}" class="btn btn-warning">
+            <i class="fas fa-cog"></i> Settings
+        </a>
+        <a href="{% url 'content:video_upload' course.id %}" class="btn btn-success">
+            <i class="fas fa-video"></i> Add Video
+        </a>
+        <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-info">
+            <i class="fas fa-laptop-code"></i> Add Interactive
+        </a>
+        <a href="{% url 'content:question_bank' course.id %}" class="btn btn-primary">
+            <i class="fas fa-question-circle"></i> Add Questions
+        </a>
+        <a href="{% url 'content:dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- Course Information Card -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Course Information</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item" href="{% url 'content:edit_course' course.id %}">
+                                <i class="fas fa-cog"></i> Course Settings
+                            </a>
+                            <a class="dropdown-item" href="{% url 'courses:course_detail' course.id %}" target="_blank">
+                                <i class="fas fa-eye"></i> Preview Course (Banker View)
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-warning" href="{% url 'content:edit_course' course.id %}">
+                                <i class="fas fa-clock"></i> Set Time Limits
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="#" onclick="confirmDeleteCourse()">
+                                <i class="fas fa-trash"></i> Delete Course
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <p class="mb-3">{{ course.description }}</p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <small class="text-muted">Passing Score:</small><br>
+                                    <strong class="text-primary">{{ course.passing_score }}%</strong>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Status:</small><br>
+                                    {% if course.is_published %}
+                                        <span class="badge badge-success badge-lg">Published</span>
+                                    {% else %}
+                                        <span class="badge badge-warning badge-lg">Draft</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Created:</small><br>
+                                    <strong>{{ course.created_at|date:"M j, Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail.url }}" class="img-fluid rounded shadow" alt="{{ course.title }}">
+                            {% else %}
+                                <div class="bg-gradient-primary rounded shadow d-flex align-items-center justify-content-center" style="height: 150px;">
+                                    <i class="fas fa-graduation-cap fa-3x text-white-50"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Stats -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Training Videos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ videos.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-video fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Assessment Questions</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ questions.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-question-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Duration</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% load video_filters %}
+                                {{ total_duration|duration_format }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Enrollments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Videos Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-video"></i> Course Videos ({{ videos.count }})
+                    </h6>
+                    <a href="{% url 'content:video_upload' course.id %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Add Video
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if videos %}
+                        <div class="list-group list-group-flush">
+                            {% for video in videos %}
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center">
+                                            <div class="mr-3">
+                                                <button class="btn btn-primary btn-sm" onclick="playVideo('{{ video.id }}', '{{ video.video_file.url }}', '{{ video.title }}')">
+                                                    <i class="fas fa-play"></i>
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">{{ video.title }}</h6>
+                                                <small class="text-muted">
+                                                    {% load video_filters %}
+                                                    Duration: {{ video.duration|duration_format }} | 
+                                                    Size: {{ video.file_size|file_size_format }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-info btn-sm" onclick="previewVideo('{{ video.video_file.url }}')">
+                                                <i class="fas fa-eye"></i> Preview
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDeleteVideo({{ video.id }}, '{{ video.title }}')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-video fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-600">No Videos Yet</h5>
+                            <p class="text-muted">Start by uploading your first training video</p>
+                            <a href="{% url 'content:video_upload' course.id %}" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Upload First Video
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-question-circle"></i> Assessment Questions ({{ questions.count }})
+                    </h6>
+                    <a href="{% url 'content:question_bank' course.id %}" class="btn btn-info btn-sm">
+                        <i class="fas fa-plus"></i> Add Questions
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if questions %}
+                        <div class="list-group list-group-flush">
+                            {% for question in questions|slice:":5" %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ question.question_text|truncatewords:8 }}</h6>
+                                        <small class="text-muted">
+                                            <span class="badge badge-secondary badge-sm">{{ question.get_question_type_display }}</span>
+                                            <span class="badge badge-info badge-sm">{{ question.topic }}</span>
+                                            <span class="badge badge-warning badge-sm">{{ question.points }} pts</span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if questions.count > 5 %}
+                            <div class="list-group-item text-center">
+                                <small class="text-muted">And {{ questions.count|add:"-5" }} more questions...</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-question-circle fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-600">No Questions Yet</h5>
+                            <p class="text-muted">Create assessment questions to test understanding</p>
+                            <a href="{% url 'content:question_bank' course.id %}" class="btn btn-info">
+                                <i class="fas fa-plus"></i> Add First Question
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Courses Section -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-gradient-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-laptop-code"></i> Interactive Courses (SCORM/Captivate)
+                        {% if interactive_courses %}({{ interactive_courses.count }}){% endif %}
+                    </h6>
+                    <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Upload Package
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if interactive_courses %}
+                        <div class="row">
+                            {% for ic in interactive_courses %}
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100 border-left-info">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title font-weight-bold text-primary mb-0">
+                                                {{ ic.title|truncatewords:5 }}
+                                            </h6>
+                                            <span class="badge badge-{{ ic.content_type }}">
+                                                {{ ic.get_content_type_display }}
+                                            </span>
+                                        </div>
+                                        
+                                        <p class="card-text small text-muted mb-3">
+                                            {{ ic.description|default:"No description"|truncatewords:15 }}
+                                        </p>
+                                        
+                                        <div class="d-flex justify-content-between small text-muted mb-3">
+                                            <span><i class="fas fa-clock"></i> {{ ic.get_duration_display }}</span>
+                                            <span><i class="fas fa-layer-group"></i> {{ ic.total_slides }} slides</span>
+                                        </div>
+                                        
+                                        <div class="btn-group btn-block">
+                                            <a href="{% url 'content:play_interactive' course.id ic.id %}" 
+                                               class="btn btn-primary btn-sm" target="_blank">
+                                                <i class="fas fa-play"></i> Launch
+                                            </a>
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onclick="confirmDeleteInteractive({{ ic.id }}, '{{ ic.title }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-light small">
+                                        <i class="fas fa-calendar"></i> Added {{ ic.created_at|date:"M d, Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-laptop-code fa-4x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-600">No Interactive Courses Yet</h5>
+                            <p class="text-muted mb-4">
+                                Upload Adobe Captivate, Articulate Storyline, or SCORM packages<br>
+                                to create rich, interactive learning experiences.
+                            </p>
+                            <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-info btn-lg">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Interactive Package
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Actions -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="fas fa-cogs"></i> Course Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'content:video_upload' course.id %}" class="btn btn-success btn-block">
+                                <i class="fas fa-video"></i><br>
+                                <small>Upload Video</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-info btn-block">
+                                <i class="fas fa-laptop-code"></i><br>
+                                <small>Interactive Course</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'content:question_bank' course.id %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-question-circle"></i><br>
+                                <small>Add Questions</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <button class="btn btn-warning btn-block" onclick="togglePublishStatus()">
+                                <i class="fas fa-{% if course.is_published %}eye-slash{% else %}eye{% endif %}"></i><br>
+                                <small>{% if course.is_published %}Unpublish{% else %}Publish{% endif %}</small>
+                            </button>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-outline-primary btn-block" target="_blank">
+                                <i class="fas fa-eye"></i><br>
+                                <small>Preview Course</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'content:edit_course' course.id %}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-cog"></i><br>
+                                <small>Settings</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Video Modal HTML
+const videoModalHTML = `
+<div class="modal fade" id="videoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalTitle">Video Player</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <video id="videoPlayer" width="100%" height="400" controls controlsList="nodownload">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        This video supports WebM format. If you experience playback issues, try using Chrome or Firefox browser.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+`;
+
+// Add modal to page when document loads
+document.addEventListener('DOMContentLoaded', function() {
+    if (!document.getElementById('videoModal')) {
+        document.body.insertAdjacentHTML('beforeend', videoModalHTML);
+    }
+});
+
+function playVideo(videoId, videoUrl, videoTitle) {
+    const modal = $('#videoModal');
+    const player = document.getElementById('videoPlayer');
+    
+    if (!player) {
+        alert('Video player not available. Please refresh the page.');
+        return;
+    }
+    
+    // Set modal title
+    document.getElementById('videoModalTitle').textContent = videoTitle;
+    
+    // Set video source
+    player.src = videoUrl;
+    player.load();
+    
+    // Show modal
+    modal.modal('show');
+    
+    // Auto play when modal is shown
+    modal.on('shown.bs.modal', function() {
+        player.play().catch(function(error) {
+            console.log('Autoplay prevented:', error);
+        });
+    });
+    
+    // Pause when modal is hidden
+    modal.on('hidden.bs.modal', function() {
+        player.pause();
+        player.currentTime = 0;
+    });
+}
+
+function previewVideo(videoUrl) {
+    playVideo('preview', videoUrl, 'Video Preview');
+}
+
+function confirmDeleteCourse() {
+    if (confirm('Are you sure you want to delete this course? This action cannot be undone.\n\nThis will also delete all videos, questions, and student progress.')) {
+        alert('Course deletion functionality will be implemented soon.');
+        // TODO: Implement course deletion
+        // window.location.href = '/content/course/{{ course.id }}/delete/';
+    }
+}
+
+function confirmDeleteVideo(videoId, videoTitle) {
+    if (confirm(`Are you sure you want to delete the video "${videoTitle}"?\n\nThis action cannot be undone and will remove all student progress for this video.`)) {
+        // Delete video via AJAX
+        fetch(`/content/video/${videoId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload(); // Refresh page to show updated video list
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the video.');
+        });
+    }
+}
+
+function togglePublishStatus() {
+    const isPublished = {% if course.is_published %}true{% else %}false{% endif %};
+    const action = isPublished ? 'unpublish' : 'publish';
+    
+    if (confirm(`Are you sure you want to ${action} this course?`)) {
+        // Redirect to course settings to change publish status
+        window.location.href = '{% url "content:edit_course" course.id %}';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,662 @@
+/* Risk & Compliance Dashboard Custom Styles */
+
+/* Timeline Styles */
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: #e3e6f0;
+}
+
+.timeline-item:last-child:before {
+    display: none;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -16px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #e3e6f0;
+}
+
+.timeline-content {
+    background: #f8f9fc;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid #4e73df;
+}
+
+.timeline-header {
+    margin-bottom: 8px;
+}
+
+/* Enhanced Card Styles */
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Risk-specific Color Scheme */
+.bg-risk-primary { background-color: #4e73df !important; }
+.bg-risk-success { background-color: #1cc88a !important; }
+.bg-risk-warning { background-color: #f6c23e !important; }
+.bg-risk-danger { background-color: #e74a3b !important; }
+.bg-risk-info { background-color: #36b9cc !important; }
+
+/* Compliance Status Badges */
+.compliance-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 0.25rem 0.5rem;
+}
+
+.compliance-badge.compliant {
+    background-color: #d1edff;
+    color: #0d6efd;
+}
+
+.compliance-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.compliance-badge.overdue {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Dashboard Cards Animation */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Enhanced Buttons */
+.btn-risk {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-risk:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Progress Bars */
+.progress-risk {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+}
+
+.progress-risk .progress-bar {
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+/* ============================================
+   Co-op Bank Branding - Sidebar & Topbar
+   Gradient: Navy Blue -> Blue -> Green
+   ============================================ */
+
+/* Sidebar Gradient */
+.sidebar.bg-gradient-primary {
+    background: linear-gradient(180deg, #002B5C 0%, #0052CC 50%, #00A651 100%) !important;
+}
+
+/* Sidebar Brand */
+.sidebar .sidebar-brand {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 1.5rem 1rem;
+}
+
+.sidebar .sidebar-brand-icon {
+    color: #00A651;
+    font-size: 1.5rem;
+}
+
+.sidebar .sidebar-brand-text {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar Divider */
+.sidebar hr.sidebar-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Sidebar Heading */
+.sidebar .sidebar-heading {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar Nav Items */
+.sidebar .nav-item .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-item .nav-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #00A651;
+}
+
+.sidebar .nav-item .nav-link.active,
+.sidebar .nav-item.active .nav-link {
+    color: #ffffff;
+    background: rgba(0, 166, 81, 0.2);
+    border-left: 3px solid #00A651;
+}
+
+.sidebar .nav-item .nav-link i {
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.3s ease;
+}
+
+.sidebar .nav-item .nav-link:hover i,
+.sidebar .nav-item.active .nav-link i {
+    color: #00A651;
+}
+
+/* Sidebar Toggle Button */
+#sidebarToggle,
+#sidebarToggleTop {
+    background: rgba(0, 166, 81, 0.3);
+    border: none;
+}
+
+#sidebarToggle:hover,
+#sidebarToggleTop:hover {
+    background: #00A651;
+}
+
+/* Collapse Inner Menu */
+.sidebar .collapse-inner {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar .collapse-inner .collapse-item {
+    color: #002B5C;
+    transition: all 0.2s ease;
+}
+
+.sidebar .collapse-inner .collapse-item:hover {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%);
+    color: #ffffff;
+}
+
+.sidebar .collapse-inner .collapse-item i {
+    margin-right: 8px;
+    color: #00A651;
+}
+
+.sidebar .collapse-inner .collapse-item:hover i {
+    color: #ffffff;
+}
+
+.sidebar .collapse-inner .collapse-header {
+    color: #0052CC;
+    font-weight: 700;
+}
+
+/* ============================================
+   Topbar Gradient Styling
+   ============================================ */
+
+.topbar {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 50%, #00A651 100%) !important;
+    border-bottom: 3px solid #00A651;
+}
+
+.topbar .navbar-search .form-control {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+}
+
+.topbar .navbar-search .form-control:focus {
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 166, 81, 0.3);
+}
+
+.topbar .navbar-search .btn-primary {
+    background: #00A651;
+    border-color: #00A651;
+}
+
+.topbar .navbar-search .btn-primary:hover {
+    background: #008f45;
+    border-color: #008f45;
+}
+
+/* Topbar Icons and Text */
+.topbar .nav-item .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    transition: color 0.3s ease;
+}
+
+.topbar .nav-item .nav-link:hover {
+    color: #ffffff !important;
+}
+
+.topbar .nav-item .nav-link .badge {
+    font-size: 0.65rem;
+}
+
+/* Topbar Mobile Toggle */
+#sidebarToggleTop {
+    color: #ffffff;
+}
+
+/* Topbar User Info */
+.topbar .nav-item.dropdown .dropdown-toggle::after {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.topbar .img-profile {
+    border: 2px solid #00A651;
+}
+
+.topbar .user-info-text {
+    color: #ffffff !important;
+}
+
+.topbar .user-info-text .text-gray-600,
+.topbar .user-info-text .text-gray-800 {
+    color: #ffffff !important;
+}
+
+/* Dropdown Menus */
+.topbar .dropdown-menu {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+}
+
+.topbar .dropdown-header {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.topbar .dropdown-item:hover {
+    background: linear-gradient(90deg, rgba(0, 43, 92, 0.1) 0%, rgba(0, 82, 204, 0.1) 100%);
+}
+
+.topbar .icon-circle.bg-primary {
+    background: linear-gradient(135deg, #002B5C 0%, #0052CC 100%) !important;
+}
+
+.topbar .icon-circle.bg-success {
+    background: #00A651 !important;
+}
+
+/* ============================================
+   Original Sidebar Enhancements
+   ============================================ */
+.sidebar .nav-item .nav-link[data-toggle="collapse"]::after {
+    content: '\f107';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    float: right;
+    transition: transform 0.3s ease;
+}
+
+.sidebar .nav-item .nav-link[data-toggle="collapse"][aria-expanded="true"]::after {
+    transform: rotate(180deg);
+}
+
+/* Risk Analytics Placeholder */
+.analytics-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .timeline-item {
+        padding-left: 20px;
+    }
+    
+    .timeline-marker {
+        left: -12px;
+        width: 12px;
+        height: 12px;
+    }
+    
+    .timeline-content {
+        padding: 10px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .timeline-content {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .timeline-item:before {
+        background: #4a5568;
+    }
+}
+
+/* Performance Metrics Dashboard Enhancements */
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-gradient-info {
+    background: linear-gradient(45deg, #36b9cc, #258391);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(45deg, #1cc88a, #17a673);
+}
+
+/* Performance Table Styling */
+#performanceTable {
+    font-size: 0.875rem;
+}
+
+#performanceTable .progress {
+    margin-bottom: 0;
+}
+
+#performanceTable .badge {
+    font-size: 0.75rem;
+}
+
+.user-row:hover {
+    background-color: #f8f9fc;
+    cursor: pointer;
+}
+
+/* Performance Level Indicators */
+.performance-excellent {
+    color: #1cc88a;
+    font-weight: bold;
+}
+
+.performance-good {
+    color: #36b9cc;
+    font-weight: bold;
+}
+
+.performance-needs-improvement {
+    color: #f6c23e;
+    font-weight: bold;
+}
+
+/* Modal Enhancements */
+.modal-xl {
+    max-width: 90%;
+}
+
+/* Search and Filter Controls */
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Progress Bar Animations */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Performance Stats Cards */
+.card.h-100 {
+    transition: transform 0.15s ease-in-out;
+}
+
+.card.h-100:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Button Hover Effects */
+.btn-outline-primary:hover {
+    background-color: #4e73df;
+    border-color: #4e73df;
+    transform: translateY(-1px);
+}
+
+/* Badge Improvements */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+/* Table Header Styling */
+.thead-light th {
+    background-color: #f8f9fc;
+    border-color: #e3e6f0;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.1rem;
+}
+
+/* ============================================
+   Co-op Bank Global Branding for All Users
+   ============================================ */
+
+/* Page Background */
+#content-wrapper {
+    background: linear-gradient(135deg, #f8f9fc 0%, #eef1f7 100%);
+}
+
+/* Card Headers with Co-op Bank styling */
+.card-header.bg-primary,
+.card-header.py-3.bg-primary {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%) !important;
+}
+
+/* Primary Buttons */
+.btn-primary {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #001f42 0%, #0041a3 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 82, 204, 0.3);
+}
+
+/* Success Buttons (Green) */
+.btn-success {
+    background: #00A651;
+    border-color: #00A651;
+}
+
+.btn-success:hover {
+    background: #008f45;
+    border-color: #008f45;
+}
+
+/* Info color override */
+.text-primary {
+    color: #0052CC !important;
+}
+
+.bg-primary {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%) !important;
+}
+
+.border-left-primary {
+    border-left-color: #0052CC !important;
+}
+
+.border-left-success {
+    border-left-color: #00A651 !important;
+}
+
+/* Card styling */
+.card {
+    border: none;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(0, 43, 92, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.25rem 2rem 0 rgba(0, 43, 92, 0.15);
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Progress bars with Co-op colors */
+.progress-bar.bg-success {
+    background-color: #00A651 !important;
+}
+
+.progress-bar.bg-primary {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%) !important;
+}
+
+/* Badge colors */
+.badge-primary {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%);
+}
+
+.badge-success {
+    background-color: #00A651;
+}
+
+/* Link colors */
+a {
+    color: #0052CC;
+}
+
+a:hover {
+    color: #002B5C;
+}
+
+/* Icon circles */
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Footer styling */
+.sticky-footer {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 50%, #00A651 100%);
+    color: white;
+}
+
+.sticky-footer a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sticky-footer a:hover {
+    color: #ffffff;
+}
+
+/* Course cards */
+.course-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 43, 92, 0.2);
+}
+
+.course-card .card-header {
+    background: linear-gradient(90deg, #002B5C 0%, #0052CC 100%);
+    color: white;
+}
+
+/* Alert styling */
+.alert-success {
+    background-color: rgba(0, 166, 81, 0.1);
+    border-color: #00A651;
+    color: #006633;
+}
+
+.alert-primary {
+    background-color: rgba(0, 82, 204, 0.1);
+    border-color: #0052CC;
+    color: #002B5C;
+}
+
+/* Sidebar brand logo animation */
+.sidebar-brand-icon img {
+    transition: transform 0.3s ease;
+}
+
+.sidebar-brand:hover .sidebar-brand-icon img {
+    transform: scale(1.1);
+}
+
+/* Welcome banner for dashboard */
+.welcome-banner {
+    background: linear-gradient(135deg, #002B5C 0%, #0052CC 50%, #00A651 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.welcome-banner h4 {
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.welcome-banner p {
+    opacity: 0.9;
+    margin-bottom: 0;
+}

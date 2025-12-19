@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Course Settings - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-cog"></i> Course Settings
+        </h1>
+        <a href="{% url 'content:course_detail' course.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Course Settings Form -->
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-edit"></i> Edit: {{ course.title }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Course Information -->
+                        <div class="form-group">
+                            <label for="title">Course Title *</label>
+                            <input type="text" id="title" name="title" class="form-control" value="{{ course.title }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Course Description *</label>
+                            <textarea id="description" name="description" class="form-control" rows="4" required>{{ course.description }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="passing_score">Passing Score (%)</label>
+                                    <input type="number" id="passing_score" name="passing_score" class="form-control" 
+                                           value="{{ course.passing_score }}" min="50" max="100" required>
+                                    <small class="form-text text-muted">Minimum score required to pass (50-100%)</small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="form-check mt-4">
+                                        <input type="checkbox" id="is_published" name="is_published" class="form-check-input" 
+                                               {% if course.is_published %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_published">
+                                            <strong>Publish Course</strong>
+                                        </label>
+                                        <small class="form-text text-muted d-block">Make course visible to bankers</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Course Completion Time Limits -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-clock"></i> Course Completion Time Limits
+                        </h5>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="completion_time_enabled" name="completion_time_enabled" 
+                                       class="form-check-input" {% if course.completion_time_enabled %}checked{% endif %}>
+                                <label class="form-check-label" for="completion_time_enabled">
+                                    <strong>Enable completion time limit</strong>
+                                </label>
+                                <small class="form-text text-muted d-block">
+                                    Set a deadline for bankers to complete this course
+                                </small>
+                            </div>
+                        </div>
+
+                        <div id="time_limit_settings" class="{% if not course.completion_time_enabled %}d-none{% endif %}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="completion_time_limit">Time Limit (Days)</label>
+                                        <input type="number" id="completion_time_limit" name="completion_time_limit" 
+                                               class="form-control" value="{{ course.completion_time_limit|default:'30' }}" 
+                                               min="1" max="365">
+                                        <small class="form-text text-muted">Number of days to complete the course</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Current Setting</label>
+                                        <div class="form-control-plaintext">
+                                            <span class="badge badge-info">{{ course.get_time_limit_display }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>How it works:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Bankers will see a countdown when they enroll</li>
+                                    <li>Overdue courses will be highlighted in red</li>
+                                    <li>Existing enrollments will be updated with new deadlines</li>
+                                    <li>Completed courses are not affected by time limits</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Course Statistics -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-chart-bar"></i> Course Statistics
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Total Enrollments
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ enrollments_count }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Active Learners
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_enrollments }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Completion Rate
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ completion_rate }}%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Submit Button -->
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a href="{% url 'content:course_detail' course.id %}" class="btn btn-secondary ml-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tools"></i> Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'content:video_upload' course.id %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-video text-success"></i> Upload Video
+                        </a>
+                        <a href="{% url 'content:question_bank' course.id %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-question-circle text-info"></i> Add Questions
+                        </a>
+                        <a href="{% url 'courses:course_detail' course.id %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-eye text-warning"></i> Preview Course
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Limit Quick Reference -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-lightbulb"></i> Time Limit Examples
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted">
+                        <strong>Common time limits:</strong><br>
+                        • 7 days = 1 week<br>
+                        • 14 days = 2 weeks<br>
+                        • 30 days = 1 month<br>
+                        • 90 days = 3 months<br>
+                        • 180 days = 6 months
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle time limit settings
+document.getElementById('completion_time_enabled').addEventListener('change', function() {
+    const timeLimitSettings = document.getElementById('time_limit_settings');
+    const timeLimitInput = document.getElementById('completion_time_limit');
+    
+    if (this.checked) {
+        timeLimitSettings.classList.remove('d-none');
+        timeLimitInput.required = true;
+        if (!timeLimitInput.value) {
+            timeLimitInput.value = 30; // Default to 30 days
+        }
+    } else {
+        timeLimitSettings.classList.add('d-none');
+        timeLimitInput.required = false;
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const timeEnabled = document.getElementById('completion_time_enabled').checked;
+    const timeLimit = document.getElementById('completion_time_limit').value;
+    
+    if (timeEnabled && (!timeLimit || timeLimit < 1)) {
+        e.preventDefault();
+        alert('Please enter a valid time limit (minimum 1 day).');
+        document.getElementById('completion_time_limit').focus();
+        return false;
+    }
+});
+</script>
+{% endblock %}

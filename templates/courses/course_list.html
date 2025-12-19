@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}All Courses - Risk LMS{% endblock %}
+
+{% block nav_courses %}active{% endblock %}
+
+{% block page_heading %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-graduation-cap text-primary"></i> Risk Training Courses
+        </h1>
+        <p class="mb-0 text-gray-600">
+            {% if user.is_risk_admin %}
+                Manage and oversee all risk and compliance training courses
+            {% else %}
+                Complete your mandatory risk and compliance training requirements
+            {% endif %}
+        </p>
+    </div>
+    {% if user.is_risk_admin %}
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+            <i class="fas fa-plus"></i> Course Actions
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="{% url 'content:upload_course' %}">
+                <i class="fas fa-plus"></i> Create New Course
+            </a>
+            <a class="dropdown-item" href="{% url 'content:dashboard' %}">
+                <i class="fas fa-edit"></i> Manage Content
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'progress:user_progress' user.id %}">
+                <i class="fas fa-chart-line"></i> View Progress Reports
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    {% if courses %}
+        {% for course in courses %}
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">{{ course.title }}</h6>
+                    {% if course in user_enrolled_courses %}
+                    <span class="badge badge-success">Enrolled</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <p class="text-gray-700">{{ course.description|truncatewords:30 }}</p>
+                    
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-video text-primary"></i> 
+                                {{ course.videos.count }} Videos
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-question-circle text-info"></i> 
+                                {{ course.questions.count }} Questions
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-users text-success"></i> 
+                                {{ course.enrollments.count }} Enrolled
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line text-warning"></i> 
+                                Pass: {{ course.passing_score }}%
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        
+                        {% if not user.is_risk_admin %}
+                            {% if course in user_enrolled_courses %}
+                            <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-arrow-right"></i> Continue Learning
+                            </a>
+                            {% else %}
+                            <a href="{% url 'courses:enroll_course' course.id %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-plus-circle"></i> Enroll Now
+                            </a>
+                            {% endif %}
+                        {% else %}
+                            {% if user.is_risk_admin %}
+                            <a href="{% url 'content:edit_course' course.id %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <a href="{% url 'content:course_detail' course.id %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-edit"></i> Manage
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-book fa-3x text-gray-300 mb-3"></i>
+                <h5 class="text-gray-600">No Courses Available</h5>
+                {% if user.is_risk_admin %}
+                <p class="text-gray-500">Get started by creating your first course.</p>
+                <a href="{% url 'content:upload_course' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Course
+                </a>
+                {% else %}
+                <p class="text-gray-500">Check back soon for new training courses.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

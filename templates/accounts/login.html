@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login - Risk LMS</title>
+
+    <!-- Custom fonts -->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    
+    <style>
+        .bg-login-image {
+            background: linear-gradient(135deg, #002B5C 0%, #0052CC 50%, #00A651 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .bg-login-image img {
+            max-width: 140px;
+            margin-bottom: 20px;
+            animation: pulse-glow 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))
+                        drop-shadow(0 0 20px rgba(0, 166, 81, 0.4))
+                        drop-shadow(0 0 30px rgba(0, 82, 204, 0.3));
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7))
+                        drop-shadow(0 0 35px rgba(0, 166, 81, 0.5))
+                        drop-shadow(0 0 50px rgba(0, 82, 204, 0.4));
+                transform: scale(1.05);
+            }
+        }
+        .bg-login-image img:hover {
+            animation: pulse-glow 1s ease-in-out infinite;
+            cursor: pointer;
+        }
+        .bg-login-image h2 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .bg-login-image p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        .login-logo {
+            max-width: 120px;
+            margin-bottom: 15px;
+        }
+        .domain-info {
+            background: linear-gradient(135deg, #002B5C 0%, #0052CC 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .domain-info i {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .domain-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        .bank-branding {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .bank-branding img {
+            max-height: 70px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-primary" style="background: linear-gradient(135deg, #002B5C 0%, #0052CC 50%, #00A651 100%);">
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image">
+                                <img src="{% static 'images/CoopLogo.png' %}" alt="Co-operative Bank" onerror="this.style.display='none'">
+                                <h2>Risk Department LMS</h2>
+                                <p>Learning Management System</p>
+                                <hr style="border-color: rgba(255,255,255,0.3); width: 60%;">
+                                <p class="small mt-3">
+                                    <i class="fas fa-graduation-cap mr-2"></i> Training Excellence<br>
+                                    <i class="fas fa-shield-alt mr-2"></i> Risk Management<br>
+                                    <i class="fas fa-certificate mr-2"></i> Professional Certification
+                                </p>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <!-- Bank Logo & Title -->
+                                    <div class="bank-branding">
+                                        <img src="{% static 'images/CoopLogo.png' %}" alt="Co-operative Bank of Tanzania" class="login-logo" onerror="this.style.display='none'">
+                                        <h1 class="h4 text-gray-900 mb-1">Risk Department LMS</h1>
+                                        <p class="text-muted mb-0">Co-operative Bank of Tanzania PLC</p>
+                                    </div>
+                                    
+                                    <!-- Domain Info Box -->
+                                    <div class="domain-info text-center">
+                                        <i class="fas fa-network-wired d-block"></i>
+                                        <small class="d-block mb-2">Sign in with your domain credentials</small>
+                                        <!-- <span class="domain-badge">KCBLTZ.CRDBBANKPLC.COM</span> -->
+                                    </div>
+
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <form method="post" class="user">
+                                        {% csrf_token %}
+                                        
+                                        <div class="form-group">
+                                            <label class="small text-muted mb-1">
+                                                <i class="fas fa-user mr-1"></i> Username
+                                            </label>
+                                            <input type="text" name="username" class="form-control form-control-user"
+                                                placeholder="Enter your username (e.g., JLugome)" required autofocus>
+                                            <small class="text-muted">Your Windows/Domain login username</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="small text-muted mb-1">
+                                                <i class="fas fa-lock mr-1"></i> Password
+                                            </label>
+                                            <input type="password" name="password" class="form-control form-control-user"
+                                                placeholder="Your domain password" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox" class="custom-control-input" id="customCheck">
+                                                <label class="custom-control-label" for="customCheck">Remember Me</label>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+                                        </button>
+                                    </form>
+                                    
+                                    <hr>
+                                    
+                                    <div class="text-center small text-muted">
+                                        <p class="mb-2"><strong>Role Assignment:</strong></p>
+                                        <p class="mb-1"><i class="fas fa-user-tie text-primary"></i> Head of Risk - Full admin access</p>
+                                        <p class="mb-1"><i class="fas fa-user-shield text-info"></i> Risk Specialist - Content management</p>
+                                        <p class="mb-0"><i class="fas fa-user text-success"></i> Banker - Training access</p>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <div class="text-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Your role is automatically assigned based on your AD profile
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+</body>
+</html>

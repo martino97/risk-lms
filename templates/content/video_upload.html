@@ -1,0 +1,638 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Video - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-video"></i> Upload Content
+        </h1>
+        <a href="{% url 'content:course_detail' course.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Course Info -->
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Course: {{ course.title }}</h6>
+                </div>
+                <div class="card-body">
+                    <p>{{ course.description }}</p>
+                    
+                    <!-- Content Type Selection -->
+                    <div class="alert alert-info">
+                        <h6 class="font-weight-bold mb-2"><i class="fas fa-info-circle"></i> Choose Content Type:</h6>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success" onclick="showSection('record')">
+                                <i class="fas fa-record-vinyl"></i> Record Video
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="showSection('upload')">
+                                <i class="fas fa-upload"></i> Upload Video File
+                            </button>
+                            <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-info">
+                                <i class="fas fa-laptop-code"></i> Upload Interactive Course (SCORM/Captivate)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Options -->
+    <div class="row">
+        <!-- Record Video -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-record-vinyl"></i> Record Video Now
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Record your training video directly from your camera</p>
+                    
+                    <div id="recording-interface">
+                        <video id="preview" width="100%" height="300" autoplay muted style="background: #000; border-radius: 5px;"></video>
+                        
+                        <div class="mt-3 text-center">
+                            <button id="startRecord" class="btn btn-success btn-lg">
+                                <i class="fas fa-circle"></i> Start Recording
+                            </button>
+                            <button id="stopRecord" class="btn btn-danger btn-lg" style="display: none;">
+                                <i class="fas fa-stop"></i> Stop Recording
+                            </button>
+                            <button id="playback" class="btn btn-info btn-lg" style="display: none;">
+                                <i class="fas fa-play"></i> Play Preview
+                            </button>
+                        </div>
+
+                        <div id="recording-status" class="alert alert-info mt-3" style="display: none;">
+                            <i class="fas fa-circle text-danger blink"></i> Recording...
+                        </div>
+                    </div>
+
+                    <form id="recordForm" style="display: none;" class="mt-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                        
+                        <div class="form-group">
+                            <label>Video Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Languages for Automatic Translation</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="en" checked disabled>
+                                <label class="form-check-label">English (Original)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="sw" checked>
+                                <label class="form-check-label">Swahili</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="fr">
+                                <label class="form-check-label">French</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="ar">
+                                <label class="form-check-label">Arabic</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
+                            <i class="fas fa-upload"></i> Upload Recorded Video
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload from Computer -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-upload"></i> Upload from Computer
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Upload a pre-recorded video file from your computer</p>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label>Video Title *</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Video File * (MP4, AVI, MKV - Max 2GB)</label>
+                            <input type="file" name="video_file" id="video_file_input" class="form-control-file" accept="video/*" required>
+                            <small class="form-text text-muted">Supported formats: MP4, AVI, MKV, MOV</small>
+                            
+                            <!-- Video preview for duration calculation -->
+                            <div id="video_preview_container" style="display: none;" class="mt-3">
+                                <video id="video_preview" controls style="width: 100%; max-height: 300px; background: #000; border-radius: 5px;"></video>
+                                <div id="duration_info" class="alert alert-info mt-2" style="display: none;">
+                                    <i class="fas fa-clock"></i> Video Duration: <span id="duration_display">Calculating...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Duration (seconds) *</label>
+                            <div class="input-group">
+                                <input type="number" name="duration" id="duration_input" class="form-control" required readonly>
+                                <div class="input-group-append">
+                                    <button type="button" id="time_converter_btn" class="btn btn-outline-info" title="Convert MM:SS to seconds">
+                                        <i class="fas fa-calculator"></i>
+                                    </button>
+                                    <span class="input-group-text">
+                                        <i class="fas fa-clock"></i> seconds
+                                    </span>
+                                </div>
+                            </div>
+                            <small class="form-text text-success">
+                                <i class="fas fa-magic"></i> Duration will be calculated automatically when you select a video file
+                            </small>
+                            <small class="form-text text-muted">
+                                Manual options: 
+                                <button type="button" id="manual_duration_btn" class="btn btn-sm btn-outline-secondary ml-1" style="display: none;">
+                                    <i class="fas fa-edit"></i> Edit Manually
+                                </button>
+                                <button type="button" onclick="convertTimeToSeconds()" class="btn btn-sm btn-outline-info ml-1">
+                                    <i class="fas fa-calculator"></i> Time Converter
+                                </button>
+                                <br>
+                                <span class="text-muted small">Calculator: Convert MM:SS format • Manual: Direct seconds entry</span>
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Video Order</label>
+                            <input type="number" name="order_index" class="form-control" value="{{ videos.count }}" required>
+                            <small class="form-text text-muted">Order in course (0 = first video)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Automatic Translation Languages</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="en" checked disabled>
+                                <label class="form-check-label">English (Original)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="sw" checked>
+                                <label class="form-check-label">Swahili</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="fr">
+                                <label class="form-check-label">French</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="ar">
+                                <label class="form-check-label">Arabic</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="languages" value="pt">
+                                <label class="form-check-label">Portuguese</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
+                            <i class="fas fa-upload"></i> Upload & Translate Video
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Course Upload Option -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow border-left-info">
+                <div class="card-header py-3 bg-gradient-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-laptop-code"></i> Upload Interactive Course (Adobe Captivate / SCORM / Articulate)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <p class="mb-2">
+                                <strong>Have an interactive e-learning package?</strong> Upload ZIP files exported from:
+                            </p>
+                            <ul class="mb-0">
+                                <li><i class="fas fa-check text-success"></i> <strong>Adobe Captivate</strong> - HTML5 courses with quizzes and interactions</li>
+                                <li><i class="fas fa-check text-success"></i> <strong>Articulate Storyline</strong> - Interactive scenarios and branching</li>
+                                <li><i class="fas fa-check text-success"></i> <strong>SCORM Packages</strong> - Any SCORM 1.2 or 2004 compliant content</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-info btn-lg">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Interactive Package
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Videos -->
+    {% if videos %}
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-list"></i> Uploaded Videos ({{ videos.count }})
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Title</th>
+                                    <th>Duration</th>
+                                    <th>Subtitles</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for video in videos %}
+                                <tr>
+                                    <td>{{ video.order_index }}</td>
+                                    <td>{{ video.title }}</td>
+                                    <td>
+                                        {% load video_filters %}
+                                        {{ video.duration|duration_format }}
+                                    </td>
+                                    <td>
+                                        {% for sub in video.subtitles.all %}
+                                        <span class="badge badge-info">{{ sub.language_name }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info" onclick="playVideo('{{ video.video_file.url }}')">
+                                            <i class="fas fa-play"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+.blink {
+    animation: blink 1s infinite;
+}
+</style>
+
+<script>
+let mediaRecorder;
+let recordedChunks = [];
+let stream;
+let recordingStartTime;
+let recordingTimer;
+
+// Get camera access
+async function initCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { width: 1280, height: 720 }, 
+            audio: true 
+        });
+        document.getElementById('preview').srcObject = stream;
+    } catch (err) {
+        alert('Error accessing camera: ' + err.message);
+    }
+}
+
+// Start recording
+document.getElementById('startRecord').addEventListener('click', async function() {
+    if (!stream) {
+        await initCamera();
+    }
+
+    recordedChunks = [];
+    recordingStartTime = Date.now();
+    
+    // Configure MediaRecorder with better options for WebM
+    let options = { mimeType: 'video/webm;codecs=vp9' };
+    
+    // Fallback to VP8 if VP9 not supported
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = { mimeType: 'video/webm;codecs=vp8' };
+    }
+    
+    // Fallback to default if neither VP9 nor VP8 supported
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = {};
+    }
+    
+    mediaRecorder = new MediaRecorder(stream, options);
+
+    mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+        }
+    };
+
+    mediaRecorder.onstop = function() {
+        clearInterval(recordingTimer);
+        const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+        document.getElementById('recording-status').innerHTML = 
+            `<i class="fas fa-check text-success"></i> Recording completed! Duration: ${Math.floor(duration/60)}:${(duration%60).toString().padStart(2, '0')}`;
+        document.getElementById('recordForm').style.display = 'block';
+        document.getElementById('playback').style.display = 'inline-block';
+    };
+
+    mediaRecorder.start(1000); // Record in 1-second chunks for better precision
+    document.getElementById('startRecord').style.display = 'none';
+    document.getElementById('stopRecord').style.display = 'inline-block';
+    document.getElementById('recording-status').style.display = 'block';
+    
+    // Start timer
+    recordingTimer = setInterval(function() {
+        const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('recording-status').innerHTML = 
+            `<i class="fas fa-circle text-danger blink"></i> Recording... ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+});
+
+// Stop recording
+document.getElementById('stopRecord').addEventListener('click', function() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+    }
+    clearInterval(recordingTimer);
+    document.getElementById('stopRecord').style.display = 'none';
+    document.getElementById('startRecord').style.display = 'inline-block';
+});
+
+// Playback recorded video
+document.getElementById('playback').addEventListener('click', function() {
+    // Create blob with proper MIME type
+    let mimeType = 'video/webm';
+    if (mediaRecorder && mediaRecorder.mimeType) {
+        mimeType = mediaRecorder.mimeType;
+    }
+    
+    const blob = new Blob(recordedChunks, { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const preview = document.getElementById('preview');
+    
+    // Stop current stream
+    if (preview.srcObject) {
+        const tracks = preview.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        preview.srcObject = null;
+    }
+    
+    preview.src = url;
+    preview.controls = true;
+    
+    // Show duration when video metadata loads
+    preview.onloadedmetadata = function() {
+        if (preview.duration && preview.duration !== Infinity) {
+            const duration = Math.floor(preview.duration);
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            document.getElementById('recording-status').innerHTML = 
+                `<i class="fas fa-info-circle text-info"></i> Video ready for upload! Duration: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        } else {
+            // Calculate from recording time if duration not available
+            const recordingDuration = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(recordingDuration / 60);
+            const seconds = recordingDuration % 60;
+            document.getElementById('recording-status').innerHTML = 
+                `<i class="fas fa-info-circle text-info"></i> Video ready for upload! Estimated Duration: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+    };
+});
+
+// Submit recorded video
+document.getElementById('recordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Use proper MIME type from recorder
+    let mimeType = 'video/webm';
+    let fileName = 'recorded-video.webm';
+    if (mediaRecorder && mediaRecorder.mimeType) {
+        mimeType = mediaRecorder.mimeType;
+        if (mimeType.includes('vp9')) {
+            fileName = 'recorded-video-vp9.webm';
+        } else if (mimeType.includes('vp8')) {
+            fileName = 'recorded-video-vp8.webm';
+        }
+    }
+    
+    const blob = new Blob(recordedChunks, { type: mimeType });
+    formData.append('video_blob', blob, fileName);
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    
+    try {
+        const response = await fetch('{% url "content:save_recorded_video" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            const duration = data.duration || 0;
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            alert(`Video uploaded successfully! Duration: ${minutes}:${seconds.toString().padStart(2, '0')}`);
+            window.location.href = '{% url "content:course_detail" course.id %}';
+        } else {
+            alert('Error: ' + data.error);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Recorded Video';
+        }
+    } catch (err) {
+        alert('Upload error: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Recorded Video';
+    }
+});
+
+// Play video function
+function playVideo(videoUrl) {
+    const preview = document.getElementById('preview');
+    preview.srcObject = null;
+    preview.src = videoUrl;
+    preview.controls = true;
+    preview.play();
+}
+
+// Automatic duration calculation for uploaded video files
+document.getElementById('video_file_input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const videoPreviewContainer = document.getElementById('video_preview_container');
+    const videoPreview = document.getElementById('video_preview');
+    const durationInfo = document.getElementById('duration_info');
+    const durationInput = document.getElementById('duration_input');
+    const durationDisplay = document.getElementById('duration_display');
+    const manualBtn = document.getElementById('manual_duration_btn');
+
+    // Show preview container
+    videoPreviewContainer.style.display = 'block';
+    durationInfo.style.display = 'block';
+    manualBtn.style.display = 'inline-block';
+
+    // Create object URL for the video file
+    const videoUrl = URL.createObjectURL(file);
+    videoPreview.src = videoUrl;
+
+    // Set up duration calculation
+    durationDisplay.textContent = 'Calculating...';
+    durationInput.value = '';
+
+    videoPreview.addEventListener('loadedmetadata', function() {
+        const duration = Math.round(videoPreview.duration);
+        
+        if (duration && duration !== Infinity && !isNaN(duration)) {
+            // Successfully calculated duration
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')} (${duration} seconds)`;
+            
+            durationDisplay.innerHTML = `<span class="text-success">${timeDisplay}</span>`;
+            durationInput.value = duration;
+            
+            // Update form text to show success
+            const helpText = durationInput.parentElement.nextElementSibling;
+            helpText.innerHTML = `<i class="fas fa-check text-success"></i> Duration automatically calculated: ${minutes} minutes ${seconds} seconds`;
+            helpText.className = 'form-text text-success';
+        } else {
+            // Fallback for problematic videos
+            durationDisplay.innerHTML = '<span class="text-warning">Could not calculate automatically</span>';
+            durationInput.value = '';
+            durationInput.readOnly = false;
+            durationInput.placeholder = 'Enter duration in seconds (e.g., 300 for 5 minutes)';
+            
+            const helpText = durationInput.parentElement.nextElementSibling;
+            helpText.innerHTML = '<i class="fas fa-exclamation-triangle text-warning"></i> Please enter the video duration manually';
+            helpText.className = 'form-text text-warning';
+        }
+    });
+
+    // Error handling
+    videoPreview.addEventListener('error', function() {
+        durationDisplay.innerHTML = '<span class="text-danger">Error loading video</span>';
+        durationInput.value = '';
+        durationInput.readOnly = false;
+        durationInput.placeholder = 'Enter duration in seconds';
+        
+        const helpText = durationInput.parentElement.nextElementSibling;
+        helpText.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Could not read video file. Please enter duration manually';
+        helpText.className = 'form-text text-danger';
+    });
+});
+
+// Manual duration editing
+document.getElementById('manual_duration_btn').addEventListener('click', function() {
+    const durationInput = document.getElementById('duration_input');
+    durationInput.readOnly = false;
+    durationInput.focus();
+    durationInput.select();
+    
+    const helpText = durationInput.parentElement.nextElementSibling;
+    helpText.innerHTML = '<i class="fas fa-edit text-info"></i> Manual editing enabled. Enter duration in seconds';
+    helpText.className = 'form-text text-info';
+});
+
+// Convert minutes:seconds to seconds helper
+function convertTimeToSeconds() {
+    const timeInput = prompt('Enter time in MM:SS format (e.g., 5:30 for 5 minutes 30 seconds):');
+    if (timeInput) {
+        if (timeInput.includes(':')) {
+            const parts = timeInput.split(':');
+            if (parts.length === 2) {
+                const minutes = parseInt(parts[0]);
+                const seconds = parseInt(parts[1]);
+                if (!isNaN(minutes) && !isNaN(seconds)) {
+                    const totalSeconds = (minutes * 60) + seconds;
+                    const durationInput = document.getElementById('duration_input');
+                    durationInput.readOnly = false;
+                    durationInput.value = totalSeconds;
+                    
+                    alert(`✅ Converted ${timeInput} to ${totalSeconds} seconds`);
+                    
+                    const helpText = durationInput.parentElement.nextElementSibling;
+                    helpText.innerHTML = `<i class="fas fa-check text-success"></i> Manual time entry: ${minutes}m ${seconds}s = ${totalSeconds} seconds`;
+                    helpText.className = 'form-text text-success';
+                    return;
+                }
+            }
+        } else {
+            // Try to parse as just seconds
+            const totalSeconds = parseInt(timeInput);
+            if (!isNaN(totalSeconds) && totalSeconds > 0) {
+                const durationInput = document.getElementById('duration_input');
+                durationInput.readOnly = false;
+                durationInput.value = totalSeconds;
+                
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                alert(`✅ Set duration to ${totalSeconds} seconds (${minutes}m ${seconds}s)`);
+                
+                const helpText = durationInput.parentElement.nextElementSibling;
+                helpText.innerHTML = `<i class="fas fa-check text-success"></i> Manual entry: ${totalSeconds} seconds`;
+                helpText.className = 'form-text text-success';
+                return;
+            }
+        }
+        
+        alert('❌ Invalid format. Please use MM:SS (e.g., 5:30) or just enter seconds (e.g., 330)');
+    }
+}
+
+// Add click handler for the calculator button in input group
+document.getElementById('time_converter_btn').addEventListener('click', convertTimeToSeconds);
+
+// Initialize camera on page load
+window.addEventListener('load', initCamera);
+</script>
+{% endblock %}

@@ -1,0 +1,526 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if question %}Edit{% else %}Add{% endif %} Question - {{ interactive_course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .option-row {
+        background: #f8f9fc;
+        border: 1px solid #e3e6f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    .option-row:hover {
+        background: #eef0f7;
+    }
+    .option-row.correct-option {
+        background: #d4edda;
+        border-color: #28a745;
+    }
+    .remove-option {
+        cursor: pointer;
+        color: #e74a3b;
+    }
+    .remove-option:hover {
+        color: #c82333;
+    }
+    .option-number {
+        width: 30px;
+        height: 30px;
+        background: #4e73df;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+    .add-option-btn {
+        border: 2px dashed #4e73df;
+        background: transparent;
+        color: #4e73df;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    .add-option-btn:hover {
+        background: #4e73df;
+        color: white;
+    }
+    .form-section {
+        background: #fff;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    }
+    .form-section-title {
+        color: #4e73df;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #4e73df;
+    }
+    .difficulty-selector .btn {
+        min-width: 80px;
+    }
+    .difficulty-selector .btn-outline-success.active {
+        background: #1cc88a;
+        border-color: #1cc88a;
+    }
+    .difficulty-selector .btn-outline-warning.active {
+        background: #f6c23e;
+        border-color: #f6c23e;
+    }
+    .difficulty-selector .btn-outline-danger.active {
+        background: #e74a3b;
+        border-color: #e74a3b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-transparent p-0 mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'content:dashboard' %}">Content Management</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'content:interactive_list' %}">Interactive Courses</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'content:interactive_question_bank' interactive_course.id %}">Questions</a></li>
+                    <li class="breadcrumb-item active">{% if question %}Edit{% else %}Add{% endif %}</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-{% if question %}edit{% else %}plus-circle{% endif %} text-primary"></i>
+                {% if question %}Edit Question{% else %}Add New Question{% endif %}
+            </h1>
+            <p class="text-muted mb-0">{{ interactive_course.title }}</p>
+        </div>
+        <a href="{% url 'content:interactive_question_bank' interactive_course.id %}" class="btn btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm"></i> Back to Questions
+        </a>
+    </div>
+
+    <form method="POST" id="questionForm">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Question Details Section -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-question-circle mr-2"></i> Question Details
+                    </h5>
+                    
+                    <div class="form-group">
+                        <label for="question_text" class="font-weight-bold">Question Text <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="question_text" name="question_text" rows="3" 
+                                  placeholder="Enter your question here..." required>{% if question %}{{ question.question_text }}{% endif %}</textarea>
+                        <small class="text-muted">Write a clear and concise question.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="explanation" class="font-weight-bold">Explanation (Optional)</label>
+                        <textarea class="form-control" id="explanation" name="explanation" rows="2" 
+                                  placeholder="Explain the correct answer...">{% if question %}{{ question.explanation }}{% endif %}</textarea>
+                        <small class="text-muted">This will be shown to users after they answer.</small>
+                    </div>
+                </div>
+
+                <!-- Options Section -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-list-ul mr-2"></i> Answer Options
+                    </h5>
+                    <p class="text-muted mb-3">Add at least 2 options. Mark the correct answer(s) with the checkbox.</p>
+                    
+                    <div id="optionsContainer">
+                        {% if question and question.options.all %}
+                            {% for option in question.options.all %}
+                            <div class="option-row {% if option.is_correct %}correct-option{% endif %}" data-option="{{ forloop.counter }}">
+                                <div class="d-flex align-items-center">
+                                    <div class="option-number mr-3">{{ forloop.counter }}</div>
+                                    <div class="flex-grow-1">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-white">
+                                                    <input type="checkbox" name="correct_{{ forloop.counter }}" 
+                                                           {% if option.is_correct %}checked{% endif %}
+                                                           onchange="toggleCorrect(this)">
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" name="option_{{ forloop.counter }}" 
+                                                   value="{{ option.option_text }}" placeholder="Enter option text..." required>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn" 
+                                                        onclick="removeOption(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <!-- Default 4 options -->
+                            <div class="option-row" data-option="1">
+                                <div class="d-flex align-items-center">
+                                    <div class="option-number mr-3">1</div>
+                                    <div class="flex-grow-1">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-white">
+                                                    <input type="checkbox" name="correct_1" onchange="toggleCorrect(this)">
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" name="option_1" 
+                                                   placeholder="Enter option text..." required>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn" 
+                                                        onclick="removeOption(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-row" data-option="2">
+                                <div class="d-flex align-items-center">
+                                    <div class="option-number mr-3">2</div>
+                                    <div class="flex-grow-1">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-white">
+                                                    <input type="checkbox" name="correct_2" onchange="toggleCorrect(this)">
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" name="option_2" 
+                                                   placeholder="Enter option text..." required>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn" 
+                                                        onclick="removeOption(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-row" data-option="3">
+                                <div class="d-flex align-items-center">
+                                    <div class="option-number mr-3">3</div>
+                                    <div class="flex-grow-1">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-white">
+                                                    <input type="checkbox" name="correct_3" onchange="toggleCorrect(this)">
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" name="option_3" 
+                                                   placeholder="Enter option text...">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn" 
+                                                        onclick="removeOption(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-row" data-option="4">
+                                <div class="d-flex align-items-center">
+                                    <div class="option-number mr-3">4</div>
+                                    <div class="flex-grow-1">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-white">
+                                                    <input type="checkbox" name="correct_4" onchange="toggleCorrect(this)">
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" name="option_4" 
+                                                   placeholder="Enter option text...">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-danger remove-option-btn" 
+                                                        onclick="removeOption(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="button" class="add-option-btn mt-2" onclick="addOption()">
+                        <i class="fas fa-plus mr-2"></i> Add Another Option
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Question Settings -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-cog mr-2"></i> Settings
+                    </h5>
+
+                    <div class="form-group">
+                        <label class="font-weight-bold">Difficulty Level</label>
+                        <div class="difficulty-selector btn-group btn-group-toggle w-100" data-toggle="buttons">
+                            <label class="btn btn-outline-success {% if not question or question.difficulty == 'easy' %}active{% endif %}">
+                                <input type="radio" name="difficulty" value="easy" 
+                                       {% if not question or question.difficulty == 'easy' %}checked{% endif %}> Easy
+                            </label>
+                            <label class="btn btn-outline-warning {% if question and question.difficulty == 'medium' %}active{% endif %}">
+                                <input type="radio" name="difficulty" value="medium"
+                                       {% if question and question.difficulty == 'medium' %}checked{% endif %}> Medium
+                            </label>
+                            <label class="btn btn-outline-danger {% if question and question.difficulty == 'hard' %}active{% endif %}">
+                                <input type="radio" name="difficulty" value="hard"
+                                       {% if question and question.difficulty == 'hard' %}checked{% endif %}> Hard
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topic" class="font-weight-bold">Topic</label>
+                        <input type="text" class="form-control" id="topic" name="topic" 
+                               value="{% if question %}{{ question.topic }}{% endif %}"
+                               placeholder="e.g., Risk Assessment, Compliance">
+                        <small class="text-muted">Group questions by topic for random selection.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="points" class="font-weight-bold">Points</label>
+                        <input type="number" class="form-control" id="points" name="points" 
+                               value="{% if question %}{{ question.points }}{% else %}1{% endif %}" 
+                               min="1" max="10">
+                        <small class="text-muted">Points awarded for correct answer.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="question_type" class="font-weight-bold">Question Type</label>
+                        <select class="form-control" id="question_type" name="question_type">
+                            <option value="multiple_choice" {% if question and question.question_type == 'multiple_choice' %}selected{% endif %}>
+                                Multiple Choice (Single Answer)
+                            </option>
+                            <option value="multiple_select" {% if question and question.question_type == 'multiple_select' %}selected{% endif %}>
+                                Multiple Select (Multiple Answers)
+                            </option>
+                            <option value="true_false" {% if question and question.question_type == 'true_false' %}selected{% endif %}>
+                                True/False
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Help Card -->
+                <div class="card bg-light border-0">
+                    <div class="card-body">
+                        <h6 class="font-weight-bold text-primary">
+                            <i class="fas fa-info-circle mr-2"></i> Tips
+                        </h6>
+                        <ul class="small text-muted mb-0">
+                            <li class="mb-2">Check the box next to correct answer(s)</li>
+                            <li class="mb-2">At least one option must be marked correct</li>
+                            <li class="mb-2">Use topics to organize questions</li>
+                            <li class="mb-2">Add explanations to help users learn</li>
+                            <li>Questions are randomly selected for quizzes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-block mb-2">
+                        <i class="fas fa-save mr-2"></i> {% if question %}Update{% else %}Save{% endif %} Question
+                    </button>
+                    <button type="submit" name="save_and_add" value="1" class="btn btn-outline-primary btn-block mb-2">
+                        <i class="fas fa-plus mr-2"></i> Save & Add Another
+                    </button>
+                    <a href="{% url 'content:interactive_question_bank' interactive_course.id %}" class="btn btn-secondary btn-block">
+                        <i class="fas fa-times mr-2"></i> Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden field to track option count -->
+        <input type="hidden" name="option_count" id="optionCount" value="{% if question %}{{ question.options.count }}{% else %}4{% endif %}">
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let optionCounter = parseInt(document.getElementById('optionCount').value) || 4;
+
+function addOption() {
+    optionCounter++;
+    const container = document.getElementById('optionsContainer');
+    const optionHtml = `
+        <div class="option-row" data-option="${optionCounter}">
+            <div class="d-flex align-items-center">
+                <div class="option-number mr-3">${optionCounter}</div>
+                <div class="flex-grow-1">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text bg-white">
+                                <input type="checkbox" name="correct_${optionCounter}" onchange="toggleCorrect(this)">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" name="option_${optionCounter}" 
+                               placeholder="Enter option text...">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-danger remove-option-btn" 
+                                    onclick="removeOption(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', optionHtml);
+    updateOptionCount();
+}
+
+function removeOption(button) {
+    const container = document.getElementById('optionsContainer');
+    const options = container.querySelectorAll('.option-row');
+    if (options.length <= 2) {
+        alert('You must have at least 2 options.');
+        return;
+    }
+    button.closest('.option-row').remove();
+    renumberOptions();
+    updateOptionCount();
+}
+
+function renumberOptions() {
+    const container = document.getElementById('optionsContainer');
+    const options = container.querySelectorAll('.option-row');
+    options.forEach((option, index) => {
+        const num = index + 1;
+        option.querySelector('.option-number').textContent = num;
+        option.dataset.option = num;
+        
+        const checkbox = option.querySelector('input[type="checkbox"]');
+        checkbox.name = `correct_${num}`;
+        
+        const input = option.querySelector('input[type="text"]');
+        input.name = `option_${num}`;
+    });
+    optionCounter = options.length;
+}
+
+function toggleCorrect(checkbox) {
+    const row = checkbox.closest('.option-row');
+    if (checkbox.checked) {
+        row.classList.add('correct-option');
+    } else {
+        row.classList.remove('correct-option');
+    }
+}
+
+function updateOptionCount() {
+    const container = document.getElementById('optionsContainer');
+    const count = container.querySelectorAll('.option-row').length;
+    document.getElementById('optionCount').value = count;
+}
+
+// Form validation
+document.getElementById('questionForm').addEventListener('submit', function(e) {
+    const container = document.getElementById('optionsContainer');
+    const options = container.querySelectorAll('.option-row');
+    let hasCorrect = false;
+    let filledOptions = 0;
+    
+    options.forEach(option => {
+        const input = option.querySelector('input[type="text"]');
+        const checkbox = option.querySelector('input[type="checkbox"]');
+        if (input.value.trim()) {
+            filledOptions++;
+            if (checkbox.checked) {
+                hasCorrect = true;
+            }
+        }
+    });
+    
+    if (filledOptions < 2) {
+        e.preventDefault();
+        alert('Please provide at least 2 options.');
+        return;
+    }
+    
+    if (!hasCorrect) {
+        e.preventDefault();
+        alert('Please mark at least one option as correct.');
+        return;
+    }
+});
+
+// True/False question type handler
+document.getElementById('question_type').addEventListener('change', function() {
+    if (this.value === 'true_false') {
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = `
+            <div class="option-row" data-option="1">
+                <div class="d-flex align-items-center">
+                    <div class="option-number mr-3">1</div>
+                    <div class="flex-grow-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text bg-white">
+                                    <input type="checkbox" name="correct_1" onchange="toggleCorrect(this)">
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" name="option_1" value="True" readonly>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" disabled>
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="option-row" data-option="2">
+                <div class="d-flex align-items-center">
+                    <div class="option-number mr-3">2</div>
+                    <div class="flex-grow-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text bg-white">
+                                    <input type="checkbox" name="correct_2" onchange="toggleCorrect(this)">
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" name="option_2" value="False" readonly>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" disabled>
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        optionCounter = 2;
+        updateOptionCount();
+    }
+});
+</script>
+{% endblock %}

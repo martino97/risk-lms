@@ -1,0 +1,590 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Risk Training Content Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-folder-open"></i> Content Management
+        </h1>
+        <a href="{% url 'content:upload_course' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Course
+        </a>
+    </div>
+
+    <!-- Content Management Stats -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Risk Training Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ courses.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Training Videos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_videos }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-play-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Assessment Questions</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_questions }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Active Learners</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">247</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports & Analytics Section -->
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-gradient-info">
+                    <h6 class="m-0 font-weight-bold text-white">
+                        <i class="fas fa-chart-line"></i> Risk Department Reports & Analytics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Course Enrollment Report -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-left-primary h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">
+                                        <i class="fas fa-file-excel"></i> Course Enrollment Report
+                                    </h5>
+                                    <p class="card-text text-muted">
+                                        Comprehensive Excel report showing all course enrollments, completion statistics, 
+                                        user progress, and certification status across all Risk Department courses.
+                                    </p>
+                                    <div class="mb-2">
+                                        <small class="text-info">
+                                            <i class="fas fa-info-circle"></i> Includes: Course overview, enrollment data, completion rates, deadlines
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'content:enrollment_report' %}" class="btn btn-primary btn-block">
+                                        <i class="fas fa-download"></i> Download Enrollment Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Performance Report -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-left-success h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">
+                                        <i class="fas fa-file-excel"></i> User Performance Analysis
+                                    </h5>
+                                    <p class="card-text text-muted">
+                                        Detailed Excel analysis of individual user quiz performance showing correct/wrong answers, 
+                                        question-by-question breakdown, and learning capacity assessment.
+                                    </p>
+                                    <div class="mb-2">
+                                        <small class="text-info">
+                                            <i class="fas fa-info-circle"></i> Includes: Quiz scores, answer accuracy, question analysis, user capacity
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'content:performance_report' %}" class="btn btn-success btn-block">
+                                        <i class="fas fa-download"></i> Download Performance Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Analytics Features -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-lightbulb"></i> Analytics Features
+                                </h6>
+                                <p class="mb-2">
+                                    <strong>Enrollment Report:</strong> Track course adoption, completion rates, user progress, and certificate issuance. 
+                                    Perfect for monitoring Risk Department training compliance and identifying areas needing attention.
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Performance Report:</strong> Analyze individual banker performance on quizzes with detailed question-by-question 
+                                    breakdown. Review which questions users answered correctly/incorrectly to assess learning capacity and knowledge gaps.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Performance Metrics Section -->
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-gradient-success">
+                    <h6 class="m-0 font-weight-bold text-white">
+                        <i class="fas fa-users-cog"></i> Live User Performance Metrics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Performance Statistics Overview -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-left-primary h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Bankers</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_bankers }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-success h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Excellent (≥85%)</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ excellent_performers }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-info h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Good (70-84%)</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ good_performers }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-warning h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Needs Improvement</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ needs_improvement }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Table -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h6 class="font-weight-bold text-primary mb-3">
+                                <i class="fas fa-chart-bar"></i> Top Performing Bankers
+                            </h6>
+                            
+                            <!-- Performance Controls -->
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" id="userSearch" class="form-control" placeholder="🔍 Search users by name or email...">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select id="performanceFilter" class="form-control">
+                                            <option value="">All Performance Levels</option>
+                                            <option value="Excellent">Excellent (≥85%)</option>
+                                            <option value="Good">Good (70-84%)</option>
+                                            <option value="Needs Improvement">Needs Improvement</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-primary btn-block" onclick="showAllUsers()">
+                                            <i class="fas fa-expand-arrows-alt"></i> View All Users
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="performanceTable">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th><i class="fas fa-user"></i> Banker</th>
+                                            <th><i class="fas fa-graduation-cap"></i> Courses</th>
+                                            <th><i class="fas fa-chart-line"></i> Progress</th>
+                                            <th><i class="fas fa-trophy"></i> Best Score</th>
+                                            <th><i class="fas fa-calculator"></i> Avg Score</th>
+                                            <th><i class="fas fa-bullseye"></i> Accuracy</th>
+                                            <th><i class="fas fa-medal"></i> Performance</th>
+                                            <th><i class="fas fa-clock"></i> Last Activity</th>
+                                            <th><i class="fas fa-info-circle"></i> Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user_data in user_performance_data %}
+                                        <tr class="user-row" data-user-name="{{ user_data.user.get_full_name }}" data-user-email="{{ user_data.user.email }}" data-performance="{{ user_data.performance_level }}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="mr-3">
+                                                        <div class="icon-circle 
+                                                            {% if user_data.performance_level == 'Excellent' %}bg-success
+                                                            {% elif user_data.performance_level == 'Good' %}bg-info
+                                                            {% else %}bg-warning{% endif %}">
+                                                            <i class="fas fa-user text-white"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-weight-bold">{{ user_data.user.get_full_name }}</div>
+                                                        <div class="text-muted small">{{ user_data.user.email }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-primary">{{ user_data.completed_courses }}/{{ user_data.total_courses }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar 
+                                                        {% if user_data.completion_rate >= 80 %}bg-success
+                                                        {% elif user_data.completion_rate >= 50 %}bg-info
+                                                        {% else %}bg-warning{% endif %}" 
+                                                        style="width: {{ user_data.completion_rate }}%">
+                                                        {{ user_data.completion_rate }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="font-weight-bold 
+                                                    {% if user_data.best_score >= 85 %}text-success
+                                                    {% elif user_data.best_score >= 70 %}text-info
+                                                    {% else %}text-warning{% endif %}">
+                                                    {{ user_data.best_score }}%
+                                                </span>
+                                            </td>
+                                            <td>{{ user_data.avg_score }}%</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if user_data.accuracy >= 85 %}badge-success
+                                                    {% elif user_data.accuracy >= 70 %}badge-info
+                                                    {% else %}badge-warning{% endif %}">
+                                                    {{ user_data.accuracy }}%
+                                                </span>
+                                                <small class="text-muted d-block">{{ user_data.correct_answers }}/{{ user_data.total_answers }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if user_data.performance_level == 'Excellent' %}badge-success
+                                                    {% elif user_data.performance_level == 'Good' %}badge-info
+                                                    {% else %}badge-warning{% endif %}">
+                                                    {{ user_data.performance_level }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>{{ user_data.last_activity|date:"M d, Y H:i" }}</small>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="viewUserDetails('{{ user_data.user.id }}', '{{ user_data.user.get_full_name }}')">
+                                                    <i class="fas fa-eye"></i> Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted">
+                                                <i class="fas fa-info-circle"></i> No banker performance data available yet.
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Show more users button -->
+                            {% if all_performance_data|length > 10 %}
+                            <div class="text-center mt-3">
+                                <button class="btn btn-outline-secondary" onclick="loadMoreUsers()">
+                                    <i class="fas fa-plus"></i> Load More Users ({{ all_performance_data|length|add:"-10" }} more)
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Courses -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-list"></i> My Courses
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if courses %}
+                    <div class="row">
+                        {% for course in courses %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 border-left-primary">
+                                {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ course.title }}</h5>
+                                    <p class="card-text text-muted small">{{ course.description|truncatewords:20 }}</p>
+                                    
+                                    <div class="mb-2">
+                                        <span class="badge badge-success">{{ course.videos.count }} Videos</span>
+                                        <span class="badge badge-info">{{ course.interactive_courses.count }} Interactive</span>
+                                        <span class="badge badge-warning">{{ course.questions.count }} Questions</span>
+                                        {% if course.is_published %}
+                                        <span class="badge badge-primary">Published</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Draft</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <a href="{% url 'content:course_detail' course.id %}" class="btn btn-primary btn-sm btn-block">
+                                                <i class="fas fa-eye"></i> View Course
+                                            </a>
+                                        </div>
+                                        <div class="col-6">
+                                            <a href="{% url 'content:edit_course' course.id %}" class="btn btn-warning btn-sm btn-block">
+                                                <i class="fas fa-cog"></i> Settings
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-4">
+                                            <a href="{% url 'content:video_upload' course.id %}" class="btn btn-success btn-sm btn-block" title="Upload Video">
+                                                <i class="fas fa-video"></i>
+                                            </a>
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="{% url 'content:upload_interactive' course.id %}" class="btn btn-info btn-sm btn-block" title="Add Interactive Course (Captivate/SCORM)">
+                                                <i class="fas fa-laptop-code"></i>
+                                            </a>
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="{% url 'content:question_bank' course.id %}" class="btn btn-secondary btn-sm btn-block" title="Add Questions">
+                                                <i class="fas fa-question"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <!-- Course completion time limit display -->
+                                    {% if course.completion_time_enabled %}
+                                    <div class="mt-2 text-center">
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-clock"></i> {{ course.get_time_limit_display }} limit
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-book fa-5x text-gray-300 mb-3"></i>
+                        <h4 class="text-gray-600">No Courses Yet</h4>
+                        <p class="text-muted">Create your first training course to get started</p>
+                        <a href="{% url 'content:upload_course' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus"></i> Create First Course
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" role="dialog" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="userDetailsModalLabel">
+                    <i class="fas fa-user-chart"></i> User Performance Details
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin"></i> Loading user details...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('userSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.user-row');
+    
+    rows.forEach(row => {
+        const userName = row.getAttribute('data-user-name').toLowerCase();
+        const userEmail = row.getAttribute('data-user-email').toLowerCase();
+        
+        if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Performance filter
+document.getElementById('performanceFilter').addEventListener('change', function() {
+    const filterValue = this.value;
+    const rows = document.querySelectorAll('.user-row');
+    
+    rows.forEach(row => {
+        const performance = row.getAttribute('data-performance');
+        
+        if (filterValue === '' || performance === filterValue) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Show all users function
+function showAllUsers() {
+    // This would load all users via AJAX in a real implementation
+    alert('Loading all users... (Feature to be implemented with pagination)');
+}
+
+// Load more users function
+function loadMoreUsers() {
+    // This would load more users via AJAX
+    alert('Loading more users... (Feature to be implemented with pagination)');
+}
+
+// View user details function
+function viewUserDetails(userId, userName) {
+    const modal = document.getElementById('userDetailsModal');
+    const modalLabel = document.getElementById('userDetailsModalLabel');
+    const modalContent = document.getElementById('userDetailsContent');
+    
+    modalLabel.innerHTML = `<i class="fas fa-user-chart"></i> ${userName} - Performance Analysis`;
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <i class="fas fa-spinner fa-spin"></i> Loading detailed performance analysis...
+        </div>
+    `;
+    
+    $('#userDetailsModal').modal('show');
+    
+    // Simulate loading user details (in real implementation, this would be an AJAX call)
+    setTimeout(() => {
+        modalContent.innerHTML = `
+            <div class="alert alert-info">
+                <h6 class="alert-heading">
+                    <i class="fas fa-info-circle"></i> Detailed User Analysis for ${userName}
+                </h6>
+                <p class="mb-2">
+                    <strong>📊 Performance Overview:</strong> This section would show detailed quiz performance, 
+                    question-by-question analysis, learning patterns, and improvement recommendations.
+                </p>
+                <p class="mb-2">
+                    <strong>📈 Learning Capacity:</strong> Analysis of correct/wrong answer patterns, 
+                    topic mastery levels, and areas needing additional training.
+                </p>
+                <p class="mb-0">
+                    <strong>🎯 Action Items:</strong> Specific recommendations for Risk Department to improve 
+                    this user's training outcomes and compliance readiness.
+                </p>
+                <hr>
+                <p class="mb-0 text-muted">
+                    <small>
+                        <i class="fas fa-cog"></i> This detailed analysis feature is ready for implementation 
+                        with individual user quiz data and answer patterns.
+                    </small>
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-left-primary">
+                        <div class="card-body">
+                            <h6 class="text-primary">📚 Course Progress</h6>
+                            <p class="small text-muted">Detailed breakdown of progress across all enrolled courses</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-left-success">
+                        <div class="card-body">
+                            <h6 class="text-success">🧠 Quiz Analysis</h6>
+                            <p class="small text-muted">Question-by-question performance and learning patterns</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+// Auto-refresh performance data every 5 minutes
+setInterval(() => {
+    console.log('Auto-refreshing performance data...');
+    // In real implementation, this would refresh the performance metrics
+}, 300000); // 5 minutes
+
+// Initialize tooltips for performance indicators
+$(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}

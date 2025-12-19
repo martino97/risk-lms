@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Interactive Learning Modules - Risk LMS{% endblock %}
+
+{% block nav_interactive %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-laptop-code text-info"></i> Interactive Learning Modules
+        </h1>
+        {% if is_admin %}
+        <button type="button" class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#addInteractiveModal">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Add New Interactive Course
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Modules</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_modules }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-laptop-code fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if is_admin %}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Available Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ available_courses.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if courses_data %}
+    <!-- Interactive Courses Grid -->
+    <div class="row">
+        {% for item in courses_data %}
+        <div class="col-xl-4 col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <!-- Card Header with Course Type Badge -->
+                <div class="card-header py-3 d-flex justify-content-between align-items-center bg-gradient-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-laptop-code"></i> {{ item.interactive_course.title|truncatechars:30 }}
+                    </h6>
+                    <span class="badge badge-light">
+                        {{ item.interactive_course.get_content_type_display }}
+                    </span>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Description -->
+                    <p class="text-muted small mb-3">
+                        {{ item.interactive_course.description|default:"Interactive e-learning content for professional development."|truncatewords:20 }}
+                    </p>
+                    
+                    <!-- Course Info -->
+                    <div class="mb-3">
+                        <span class="badge badge-primary">
+                            <i class="fas fa-book"></i> {{ item.course.title|truncatechars:25 }}
+                        </span>
+                    </div>
+                    
+                    <!-- Module Details -->
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <div class="text-xs text-muted">Duration</div>
+                            <div class="font-weight-bold text-info">
+                                {{ item.interactive_course.get_duration_display }}
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-xs text-muted">Slides</div>
+                            <div class="font-weight-bold text-info">
+                                {{ item.interactive_course.total_slides }}
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-xs text-muted">Resolution</div>
+                            <div class="font-weight-bold text-info">
+                                {{ item.interactive_course.resolution_width }}x{{ item.interactive_course.resolution_height }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress (if enrolled and started) -->
+                    {% if item.progress %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-xs font-weight-bold">Progress</span>
+                            <span class="text-xs font-weight-bold">{{ item.progress.completion_percentage }}%</span>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar {% if item.progress.is_completed %}bg-success{% else %}bg-info{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ item.progress.completion_percentage }}%">
+                            </div>
+                        </div>
+                        {% if item.progress.is_completed %}
+                        <small class="text-success"><i class="fas fa-check-circle"></i> Completed</small>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Enrollment Status & Actions -->
+                    <div class="border-top pt-3">
+                        {% if item.is_enrolled or is_admin %}
+                            <!-- User is enrolled or is admin - can access -->
+                            <a href="{% url 'content:play_interactive' item.course.id item.interactive_course.id %}" 
+                               class="btn btn-info btn-block">
+                                <i class="fas fa-play-circle"></i> 
+                                {% if item.progress %}Continue Learning{% else %}Start Module{% endif %}
+                            </a>
+                        {% else %}
+                            <!-- User not enrolled - show enroll button -->
+                            <div class="text-center mb-2">
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-lock"></i> Enrollment Required
+                                </span>
+                            </div>
+                            <a href="{% url 'courses:course_detail' item.course.id %}" 
+                               class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-sign-in-alt"></i> View Course & Enroll
+                            </a>
+                        {% endif %}
+                        
+                        {% if is_admin %}
+                        <!-- Admin Actions -->
+                        <div class="mt-2">
+                            <div class="btn-group btn-block" role="group">
+                                <a href="{% url 'content:interactive_question_bank' item.interactive_course.id %}" 
+                                   class="btn btn-sm btn-outline-primary" title="Manage Questions">
+                                    <i class="fas fa-question-circle"></i> Questions
+                                    {% if item.question_count %}
+                                    <span class="badge badge-primary">{{ item.question_count }}</span>
+                                    {% endif %}
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="confirmDeleteInteractive({{ item.interactive_course.id }}, '{{ item.interactive_course.title|escapejs }}')"
+                                        title="Delete Module">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Card Footer -->
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                        <span>
+                            <i class="fas fa-user"></i> 
+                            {{ item.interactive_course.created_by.get_full_name|default:"Admin" }}
+                        </span>
+                        <span>
+                            <i class="fas fa-calendar"></i> 
+                            {{ item.interactive_course.created_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Interactive Courses -->
+    <div class="card shadow">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-laptop-code fa-4x text-gray-300 mb-4"></i>
+            <h5 class="text-gray-600">No Interactive Modules Available</h5>
+            <p class="text-muted mb-4">
+                {% if is_admin %}
+                    Start by uploading your first interactive learning module (Adobe Captivate, SCORM, etc.)
+                {% else %}
+                    Interactive learning modules will appear here once they are available.
+                    Check back soon or browse the available courses.
+                {% endif %}
+            </p>
+            {% if is_admin %}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addInteractiveModal">
+                <i class="fas fa-plus"></i> Add Interactive Module
+            </button>
+            {% else %}
+            <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+                <i class="fas fa-graduation-cap"></i> Browse Courses
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if is_admin %}
+<!-- Add Interactive Course Modal -->
+<div class="modal fade" id="addInteractiveModal" tabindex="-1" role="dialog" aria-labelledby="addInteractiveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-info text-white">
+                <h5 class="modal-title" id="addInteractiveModalLabel">
+                    <i class="fas fa-laptop-code"></i> Add New Interactive Course
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{% url 'content:upload_interactive_new' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Course Selection Method -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">
+                            <i class="fas fa-book text-primary"></i> Course Assignment <span class="text-danger">*</span>
+                        </label>
+                        <div class="btn-group btn-group-toggle d-flex mb-3" data-toggle="buttons">
+                            <label class="btn btn-outline-primary active flex-fill" id="btn-existing">
+                                <input type="radio" name="course_option" id="option_existing" value="existing" checked>
+                                <i class="fas fa-list"></i> Select Existing Course
+                            </label>
+                            <label class="btn btn-outline-success flex-fill" id="btn-new">
+                                <input type="radio" name="course_option" id="option_new" value="new">
+                                <i class="fas fa-plus"></i> Create New Course
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Existing Course Selection -->
+                    <div id="existing_course_section">
+                        <div class="form-group">
+                            <label for="course_id" class="font-weight-bold">
+                                <i class="fas fa-graduation-cap text-primary"></i> Select Course
+                            </label>
+                            <select class="form-control" id="course_id" name="course_id">
+                                <option value="">-- Choose a course --</option>
+                                {% for course in available_courses %}
+                                <option value="{{ course.id }}">{{ course.title }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">The interactive module will be added to this course.</small>
+                        </div>
+                    </div>
+                    
+                    <!-- New Course Creation -->
+                    <div id="new_course_section" style="display: none;">
+                        <div class="card border-success mb-3">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-plus-circle"></i> New Course Details
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="new_course_title" class="font-weight-bold">
+                                        <i class="fas fa-heading"></i> Course Title <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="new_course_title" name="new_course_title"
+                                           placeholder="e.g., Occupational Safety & Health Training">
+                                </div>
+                                <div class="form-group mb-0">
+                                    <label for="new_course_description" class="font-weight-bold">
+                                        <i class="fas fa-align-left"></i> Course Description
+                                    </label>
+                                    <textarea class="form-control" id="new_course_description" name="new_course_description" rows="2"
+                                              placeholder="Brief description of the course..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Module Details -->
+                    <div class="form-group">
+                        <label for="title" class="font-weight-bold">
+                            <i class="fas fa-heading text-info"></i> Module Title <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="title" name="title" required
+                               placeholder="e.g., OSH Awareness Training 2024">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="font-weight-bold">
+                            <i class="fas fa-align-left text-info"></i> Module Description
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Brief description of the interactive module..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="content_type" class="font-weight-bold">
+                                    <i class="fas fa-tag text-info"></i> Content Type <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control" id="content_type" name="content_type" required>
+                                    <option value="captivate" selected>Adobe Captivate</option>
+                                    <option value="scorm">SCORM Package</option>
+                                    <option value="html5">HTML5 Course</option>
+                                    <option value="articulate">Articulate Storyline</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="order_index" class="font-weight-bold">
+                                    <i class="fas fa-sort-numeric-up text-info"></i> Order Index
+                                </label>
+                                <input type="number" class="form-control" id="order_index" name="order_index" 
+                                       value="0" min="0">
+                                <small class="form-text text-muted">Display order within the course</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label for="package_file" class="font-weight-bold">
+                            <i class="fas fa-file-archive text-warning"></i> Package File (ZIP) <span class="text-danger">*</span>
+                        </label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="package_file" name="package_file" 
+                                   accept=".zip" required>
+                            <label class="custom-file-label" for="package_file">Choose ZIP file...</label>
+                        </div>
+                        <small class="form-text text-muted">
+                            Upload the published ZIP file from Adobe Captivate or other e-learning tools.
+                            The ZIP should contain an index.html file.
+                        </small>
+                    </div>
+                    
+                    <!-- Help Box -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> How to create the ZIP file:</h6>
+                        <ol class="mb-0 small">
+                            <li>In Adobe Captivate: File → Publish → HTML5</li>
+                            <li>Select all published files and create a ZIP</li>
+                            <li>Make sure index.html is in the root of the ZIP</li>
+                            <li>Upload the ZIP file here</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-upload"></i> Upload Interactive Course
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle between existing and new course sections
+document.querySelectorAll('input[name="course_option"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        var existingSection = document.getElementById('existing_course_section');
+        var newSection = document.getElementById('new_course_section');
+        var courseSelect = document.getElementById('course_id');
+        var newCourseTitle = document.getElementById('new_course_title');
+        
+        if (this.value === 'existing') {
+            existingSection.style.display = 'block';
+            newSection.style.display = 'none';
+            courseSelect.required = true;
+            newCourseTitle.required = false;
+        } else {
+            existingSection.style.display = 'none';
+            newSection.style.display = 'block';
+            courseSelect.required = false;
+            newCourseTitle.required = true;
+        }
+    });
+});
+
+// Update file input label with selected filename
+document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+    var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose ZIP file...';
+    var label = e.target.nextElementSibling;
+    label.textContent = fileName;
+});
+
+// Delete confirmation for interactive course
+function confirmDeleteInteractive(interactiveId, title) {
+    if (confirm('Are you sure you want to delete "' + title + '"?\n\nThis will permanently delete the interactive course and all associated progress records.\n\nThis action cannot be undone.')) {
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/content/interactive/' + interactiveId + '/delete/';
+        
+        var csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

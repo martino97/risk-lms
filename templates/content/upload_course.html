@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create New Course - Risk LMS{% endblock %}
+
+{% block page_heading %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-plus-circle text-primary"></i> Create New Risk Training Course
+        </h1>
+        <p class="mb-0 text-gray-600">Build comprehensive risk and compliance training</p>
+    </div>
+    <a href="{% url 'content:dashboard' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Content Management
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-book"></i> Course Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="title" class="font-weight-bold">Course Title *</label>
+                            <input type="text" class="form-control form-control-lg" id="title" name="title" 
+                                   placeholder="e.g., Credit Risk Management Fundamentals" required>
+                            <small class="form-text text-muted">Choose a clear, descriptive title for your training course</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold">Course Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                      placeholder="Describe what learners will gain from this course..." required></textarea>
+                            <small class="form-text text-muted">Provide a detailed overview of the course content and objectives</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="passing_score" class="font-weight-bold">Passing Score (%)</label>
+                                    <input type="number" class="form-control" id="passing_score" name="passing_score" 
+                                           value="80" min="1" max="100">
+                                    <small class="form-text text-muted">Minimum score required to pass (default: 80%)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="thumbnail" class="font-weight-bold">Course Thumbnail</label>
+                                    <input type="file" class="form-control-file" id="thumbnail" name="thumbnail" 
+                                           accept="image/*">
+                                    <small class="form-text text-muted">Upload an image to represent this course (optional)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="is_published" name="is_published">
+                                <label class="custom-control-label font-weight-bold" for="is_published">
+                                    Publish Course Immediately
+                                </label>
+                                <small class="form-text text-muted d-block">If checked, the course will be available to learners immediately. Otherwise, it will be saved as a draft.</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary btn-lg mr-2">
+                                <i class="fas fa-save"></i> Create Course
+                            </button>
+                            <a href="{% url 'content:dashboard' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Course Creation Guide -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="fas fa-lightbulb"></i> Course Creation Guide
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6 class="font-weight-bold">1. Create Course</h6>
+                                <p class="mb-0 small text-muted">Set up basic course information and settings</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-info"></div>
+                            <div class="timeline-content">
+                                <h6 class="font-weight-bold">2. Upload Videos</h6>
+                                <p class="mb-0 small text-muted">Add training videos with subtitles</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-warning"></div>
+                            <div class="timeline-content">
+                                <h6 class="font-weight-bold">3. Add Questions</h6>
+                                <p class="mb-0 small text-muted">Create assessment questions and answers</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="font-weight-bold">4. Publish</h6>
+                                <p class="mb-0 small text-muted">Make course available to learners</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Training Tips -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="fas fa-shield-alt"></i> Risk Training Best Practices
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success mr-2"></i>
+                            <small><strong>Clear Learning Objectives:</strong> Define what learners will achieve</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success mr-2"></i>
+                            <small><strong>Interactive Content:</strong> Use videos and assessments</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success mr-2"></i>
+                            <small><strong>Real-world Scenarios:</strong> Include practical examples</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success mr-2"></i>
+                            <small><strong>Regular Updates:</strong> Keep content current with regulations</small>
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success mr-2"></i>
+                            <small><strong>Progress Tracking:</strong> Monitor learner completion</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: #e3e6f0;
+}
+
+.timeline-item:last-child:before {
+    display: none;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -16px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #e3e6f0;
+}
+
+.timeline-content {
+    background: #f8f9fc;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid #4e73df;
+}
+</style>
+{% endblock %}

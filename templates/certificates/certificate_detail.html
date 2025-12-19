@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Certificate Details - {{ certificate.get_course_title }}{% endblock %}
+
+{% block nav_certificates %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-award text-warning mr-2"></i>
+            Certificate Details
+        </h1>
+        <div class="d-none d-lg-inline-block">
+            <a href="{% url 'certificates:my_certificates' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50 mr-1"></i>
+                Back to Certificates
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Certificate Preview -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-certificate mr-2"></i>
+                        Certificate Preview
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <!-- Certificate Design -->
+                    <div class="certificate-container bg-light p-4 rounded">
+                        <div class="certificate-border p-4">
+                            <div class="certificate-content text-center">
+                                <!-- Header -->
+                                <div class="certificate-header mb-4">
+                                    <div class="company-logo mb-3">
+                                        <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                                    </div>
+                                    <h2 class="text-primary mb-2">Risk Management Institute</h2>
+                                    <p class="text-muted mb-0">Professional Training Certification</p>
+                                </div>
+                                
+                                <!-- Title -->
+                                <div class="certificate-title mb-4">
+                                    <h3 class="text-dark mb-3">Certificate of Completion</h3>
+                                    <div class="decorative-line mx-auto mb-3"></div>
+                                    <p class="lead text-muted">This is to certify that</p>
+                                </div>
+                                
+                                <!-- Recipient -->
+                                <div class="certificate-recipient mb-4">
+                                    <h1 class="display-4 text-primary font-weight-bold mb-3">
+                                        {{ certificate.user.get_full_name|default:certificate.user.username }}
+                                    </h1>
+                                    <p class="lead text-muted mb-0">has successfully completed the course</p>
+                                </div>
+                                
+                                <!-- Course -->
+                                <div class="certificate-course mb-4">
+                                    <h2 class="text-dark font-weight-bold mb-2">{{ certificate.get_course_title }}</h2>
+                                    <p class="text-muted mb-3">{% if certificate.course %}{{ certificate.course.description|truncatewords:20 }}{% elif certificate.interactive_course %}{{ certificate.interactive_course.description|truncatewords:20 }}{% endif %}</p>
+                                    <p class="text-muted mb-0">
+                                        with a final score of 
+                                        <span class="font-weight-bold text-success">{{ certificate.overall_score|floatformat:1 }}%</span>
+                                    </p>
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div class="certificate-footer">
+                                    <div class="row align-items-end">
+                                        <div class="col-md-4 text-center">
+                                            <div class="signature-line mb-2"></div>
+                                            <p class="small text-muted mb-0">Risk Manager</p>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <div class="qr-code-placeholder mb-2">
+                                                <i class="fas fa-qrcode fa-2x text-muted"></i>
+                                                <p class="small text-muted mb-0 mt-2">Scan to verify</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <p class="small text-muted mb-1">
+                                                Issued: {{ certificate.issue_date|date:"F d, Y" }}
+                                            </p>
+                                            <p class="small text-muted mb-0">
+                                                Certificate #: {{ certificate.certificate_number }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="mt-4 text-center">
+                        {% if certificate.is_valid %}
+                            <a href="{% url 'certificates:download' certificate.id %}" 
+                               class="btn btn-primary btn-lg mr-3">
+                                <i class="fas fa-download mr-2"></i>
+                                Download PDF
+                            </a>
+                            <button class="btn btn-outline-primary btn-lg" onclick="window.print()">
+                                <i class="fas fa-print mr-2"></i>
+                                Print Certificate
+                            </button>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-clock mr-2"></i>
+                                This certificate is being processed and will be available for download soon.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Information -->
+        <div class="col-lg-4">
+            <!-- Status Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Certificate Status
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="small text-muted">Status</label>
+                        <div>
+                            {% if certificate.is_valid %}
+                                <span class="badge badge-success badge-lg">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Valid & Active
+                                </span>
+                            {% else %}
+                                <span class="badge badge-warning badge-lg">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    Processing
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="small text-muted">Certificate Number</label>
+                        <div class="font-weight-bold">{{ certificate.certificate_number }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="small text-muted">Issued Date</label>
+                        <div>{{ certificate.issue_date|date:"F d, Y" }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="small text-muted">Expiry Date</label>
+                        <div>
+                            {% if certificate.expiry_date %}
+                                {{ certificate.expiry_date|date:"F d, Y" }}
+                            {% else %}
+                                <span class="text-success">No Expiration</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <label class="small text-muted">Final Score</label>
+                        <div>
+                            <span class="badge badge-{% if certificate.overall_score >= 90 %}success{% elif certificate.overall_score >= 80 %}warning{% else %}danger{% endif %} badge-lg">
+                                {{ certificate.overall_score|floatformat:1 }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Information -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-book mr-2"></i>
+                        Course Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="small text-muted">Course Title</label>
+                        <div class="font-weight-bold">{{ certificate.get_course_title }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="small text-muted">Category</label>
+                        <div>{% if certificate.course %}{{ certificate.course.category }}{% elif certificate.interactive_course %}Interactive Course{% endif %}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="small text-muted">Description</label>
+                        <div class="small">{% if certificate.course %}{{ certificate.course.description|truncatewords:25 }}{% elif certificate.interactive_course %}{{ certificate.interactive_course.description|truncatewords:25 }}{% endif %}</div>
+                    </div>
+                    
+                    <div class="mb-0">
+                        {% if certificate.course %}
+                        <a href="{% url 'courses:course_detail' certificate.course.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye mr-1"></i>
+                            View Course
+                        </a>
+                        {% elif certificate.interactive_course %}
+                        <a href="{% url 'content:play_interactive' certificate.interactive_course.course.id certificate.interactive_course.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye mr-1"></i>
+                            View Interactive Course
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification Info -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Verification
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">
+                        This certificate can be verified using the certificate number or QR code.
+                    </p>
+                    
+                    <div class="mb-3">
+                        <label class="small text-muted">Verification URL</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control form-control-sm" 
+                                   value="{{ request.build_absolute_uri }}{% url 'certificates:verify' certificate.certificate_number %}"
+                                   readonly>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary btn-sm" 
+                                        type="button"
+                                        onclick="copyToClipboard(this.previousElementSibling)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'certificates:verify' certificate.certificate_number %}" 
+                       class="btn btn-outline-primary btn-sm" 
+                       target="_blank">
+                        <i class="fas fa-external-link-alt mr-1"></i>
+                        Verify Certificate
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.certificate-container {
+    background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+    border: 2px solid #d1ecf1;
+}
+
+.certificate-border {
+    border: 3px solid #5a5c69;
+    background: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.decorative-line {
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(to right, #4e73df, #1cc88a);
+}
+
+.signature-line {
+    width: 100px;
+    height: 1px;
+    background: #5a5c69;
+    margin: 0 auto;
+}
+
+.qr-code-placeholder {
+    width: 80px;
+    height: 80px;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.badge-lg {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+
+@media print {
+    .btn, .card-header, .alert, .navbar, .sidebar {
+        display: none !important;
+    }
+    
+    .certificate-container {
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .certificate-border {
+        border: 2px solid #000 !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyToClipboard(element) {
+    element.select();
+    element.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    
+    // Show feedback
+    const button = element.nextElementSibling.querySelector('button');
+    const originalIcon = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check text-success"></i>';
+    
+    setTimeout(() => {
+        button.innerHTML = originalIcon;
+    }, 2000);
+}
+</script>
+{% endblock %}

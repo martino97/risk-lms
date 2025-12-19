@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Certificate Verification{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="text-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-shield-alt text-primary mr-2"></i>
+            Certificate Verification
+        </h1>
+        <p class="text-muted">Verify the authenticity of Risk Management training certificates</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if certificate %}
+                {% if valid %}
+                    <!-- Valid Certificate -->
+                    <div class="card shadow border-success">
+                        <div class="card-header bg-success text-white text-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Valid Certificate
+                            </h4>
+                            <p class="mb-0 mt-2">This certificate is authentic and valid</p>
+                        </div>
+                        <div class="card-body">
+                            <!-- Certificate Information -->
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="text-primary mb-3">Certificate Details</h5>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Certificate #:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <code>{{ certificate.certificate_number }}</code>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Recipient:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            {{ certificate.user.get_full_name|default:certificate.user.username }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Course:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            {{ certificate.course.title }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Category:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            {{ certificate.course.category }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Final Score:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <span class="badge badge-{% if certificate.overall_score >= 90 %}success{% elif certificate.overall_score >= 80 %}warning{% else %}danger{% endif %} badge-lg">
+                                                {{ certificate.overall_score|floatformat:1 }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Issued Date:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            {{ certificate.issued_date|date:"F d, Y" }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4">
+                                            <strong>Expiry Date:</strong>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            {% if certificate.expiry_date %}
+                                                {{ certificate.expiry_date|date:"F d, Y" }}
+                                                {% if certificate.expiry_date < today %}
+                                                    <span class="badge badge-danger ml-2">Expired</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-success">No Expiration</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 text-center">
+                                    <div class="verification-seal">
+                                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                             style="width: 100px; height: 100px;">
+                                            <i class="fas fa-certificate fa-3x"></i>
+                                        </div>
+                                        <h6 class="text-success font-weight-bold">Verified</h6>
+                                        <small class="text-muted">
+                                            Risk Management Institute<br>
+                                            Official Certificate
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Course Description -->
+                            <div class="mt-4 pt-4 border-top">
+                                <h6 class="text-primary mb-2">Course Description</h6>
+                                <p class="text-muted mb-0">{{ certificate.course.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Invalid Certificate -->
+                    <div class="card shadow border-danger">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-times-circle mr-2"></i>
+                                Invalid Certificate
+                            </h4>
+                            <p class="mb-0 mt-2">This certificate is not valid or has been revoked</p>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="verification-seal mb-4">
+                                <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 100px; height: 100px;">
+                                    <i class="fas fa-ban fa-3x"></i>
+                                </div>
+                                <h6 class="text-danger font-weight-bold">Not Verified</h6>
+                                <p class="text-muted mb-0">
+                                    Certificate #: <code>{{ certificate.certificate_number }}</code><br>
+                                    This certificate may be expired, revoked, or invalid.
+                                </p>
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    Certificate Status Issue
+                                </h6>
+                                <p class="mb-2">This certificate cannot be verified for one of the following reasons:</p>
+                                <ul class="mb-0 text-left">
+                                    <li>Certificate has expired</li>
+                                    <li>Certificate has been revoked</li>
+                                    <li>User no longer meets certification requirements</li>
+                                    <li>Certificate was issued in error</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- Certificate Not Found -->
+                <div class="card shadow border-warning">
+                    <div class="card-header bg-warning text-dark text-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-search mr-2"></i>
+                            Certificate Not Found
+                        </h4>
+                        <p class="mb-0 mt-2">The requested certificate could not be located</p>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="verification-seal mb-4">
+                            <div class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                 style="width: 100px; height: 100px;">
+                                <i class="fas fa-question fa-3x"></i>
+                            </div>
+                            <h6 class="text-warning font-weight-bold">Unknown Certificate</h6>
+                            <p class="text-muted mb-0">
+                                The certificate number provided does not match our records.
+                            </p>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Possible Reasons
+                            </h6>
+                            <ul class="mb-0 text-left">
+                                <li>Certificate number was entered incorrectly</li>
+                                <li>Certificate has not been issued yet</li>
+                                <li>Certificate was issued by a different organization</li>
+                                <li>Certificate number format is invalid</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Verification Form -->
+            <div class="card shadow mt-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-search mr-2"></i>
+                        Verify Another Certificate
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'certificates:verify' 'placeholder' %}">
+                        <div class="form-group">
+                            <label for="cert_number">Certificate Number</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="cert_number" 
+                                   name="certificate_number"
+                                   placeholder="Enter certificate number (e.g., CERT-2024-001234)"
+                                   required>
+                            <small class="form-text text-muted">
+                                Enter the complete certificate number as shown on the certificate
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search mr-2"></i>
+                            Verify Certificate
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Additional Information -->
+            <div class="card shadow mt-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        About Certificate Verification
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">How Verification Works</h6>
+                            <ul class="small text-muted">
+                                <li>Each certificate has a unique number</li>
+                                <li>Numbers are verified against our secure database</li>
+                                <li>QR codes provide quick verification access</li>
+                                <li>Verification is available 24/7</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Certificate Security</h6>
+                            <ul class="small text-muted">
+                                <li>Certificates cannot be forged or duplicated</li>
+                                <li>All records are maintained securely</li>
+                                <li>Verification status is updated in real-time</li>
+                                <li>Invalid certificates are flagged immediately</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.badge-lg {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.verification-seal {
+    padding: 20px;
+}
+
+.card.border-success {
+    border-color: #1cc88a !important;
+}
+
+.card.border-danger {
+    border-color: #e74a3b !important;
+}
+
+.card.border-warning {
+    border-color: #f6c23e !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update form action when certificate number is entered
+document.getElementById('cert_number').addEventListener('input', function() {
+    const form = this.closest('form');
+    const certNumber = this.value.trim();
+    if (certNumber) {
+        const baseUrl = "{% url 'certificates:verify' 'placeholder' %}".replace('placeholder', '');
+        form.action = baseUrl + certNumber + '/';
+    }
+});
+</script>
+{% endblock %}

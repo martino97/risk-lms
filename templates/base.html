@@ -1,0 +1,398 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Risk Department Learning Management System">
+    <meta name="author" content="">
+
+    <title>{% block title %}COOP LMS{% endblock %}</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/risk-dashboard.css' %}" rel="stylesheet">
+
+    <!-- Co-op Bank Branding Override -->
+    <style>
+        /* Sidebar Gradient - Co-op Bank Colors */
+        #accordionSidebar,
+        .sidebar,
+        .sidebar.bg-gradient-primary,
+        .bg-gradient-primary {
+            background: linear-gradient(180deg, #002B5C 0%, #0052CC 50%, #00A651 100%) !important;
+        }
+        
+        /* Topbar Gradient */
+        .topbar,
+        .navbar.topbar {
+            background: linear-gradient(90deg, #002B5C 0%, #0052CC 50%, #00A651 100%) !important;
+            border-bottom: 3px solid #00A651;
+        }
+        
+        /* Topbar text colors */
+        .topbar .nav-link,
+        .topbar .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .topbar .nav-link:hover {
+            color: #ffffff !important;
+        }
+        
+        /* Search button */
+        .topbar .input-group-append .btn {
+            background: #00A651 !important;
+            border-color: #00A651 !important;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        {% if user.is_authenticated %}
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background: linear-gradient(180deg, #002B5C 0%, #0052CC 50%, #00A651 100%) !important;">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'courses:dashboard' %}">
+                <div class="sidebar-brand-icon">
+                    <img src="{% static 'images/CoopLogo.png' %}" alt="Co-op Bank" style="width: 40px; height: auto;" onerror="this.outerHTML='<i class=\'fas fa-shield-alt\'></i>'">
+                </div>
+                <div class="sidebar-brand-text mx-2">COOP LMS</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item {% block nav_dashboard %}{% endblock %}">
+                <a class="nav-link" href="{% url 'courses:dashboard' %}">
+                    <i class="fas fa-fw fa-chart-pie"></i>
+                    <span>Risk Overview</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Training Management
+            </div>
+
+            <!-- Nav Item - Courses -->
+            <li class="nav-item {% block nav_courses %}{% endblock %}">
+                <a class="nav-link" href="{% url 'courses:course_list' %}">
+                    <i class="fas fa-fw fa-graduation-cap"></i>
+                    <span>Training Courses</span></a>
+            </li>
+
+            {% if user.is_risk_admin %}
+            <!-- Nav Item - Content Management -->
+            <li class="nav-item {% block nav_content %}{% endblock %}">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseContent" aria-expanded="true" aria-controls="collapseContent">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Content Management</span>
+                </a>
+                <div id="collapseContent" class="collapse" aria-labelledby="headingContent" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Training Content:</h6>
+                        <a class="collapse-item" href="{% url 'content:dashboard' %}">
+                            <i class="fas fa-video"></i> Upload Videos
+                        </a>
+                        <a class="collapse-item" href="{% url 'content:interactive_list' %}">
+                            <i class="fas fa-laptop-code"></i> Interactive Courses
+                        </a>
+                        <a class="collapse-item" href="{% url 'content:dashboard' %}">
+                            <i class="fas fa-question-circle"></i> Add Questions
+                        </a>
+                        <a class="collapse-item" href="{% url 'content:upload_course' %}">
+                            <i class="fas fa-book"></i> Create Course
+                        </a>
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+
+            <!-- Nav Item - Interactive Learning (for all users) -->
+            <li class="nav-item {% block nav_interactive %}{% endblock %}">
+                <a class="nav-link" href="{% url 'content:interactive_list' %}">
+                    <i class="fas fa-fw fa-laptop-code"></i>
+                    <span>Interactive Modules</span></a>
+            </li>
+
+            {% if user.is_risk_admin %}
+            <!-- Nav Item - Compliance Tracking -->
+            <li class="nav-item {% block nav_compliance %}{% endblock %}">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCompliance" aria-expanded="true" aria-controls="collapseCompliance">
+                    <i class="fas fa-fw fa-clipboard-check"></i>
+                    <span>Compliance Tracking</span>
+                </a>
+                <div id="collapseCompliance" class="collapse" aria-labelledby="headingCompliance" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Monitoring:</h6>
+                        <a class="collapse-item" href="{% url 'progress:course_analytics' %}">
+                            <i class="fas fa-chart-bar"></i> Enrollment Analytics
+                        </a>
+                        <a class="collapse-item" href="{% url 'progress:user_progress' user.id %}">
+                            <i class="fas fa-chart-line"></i> Progress Reports
+                        </a>
+                        <a class="collapse-item" href="{% url 'certificates:my_certificates' %}">
+                            <i class="fas fa-certificate"></i> Certifications
+                        </a>
+                        <a class="collapse-item" href="{% url 'content:enrollment_report' %}">
+                            <i class="fas fa-file-excel"></i> Export Reports
+                        </a>
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                {% if user.is_risk_admin %}Risk & Compliance{% else %}My Learning{% endif %}
+            </div>
+
+            <!-- Nav Item - My Progress -->
+            <li class="nav-item {% block nav_progress %}{% endblock %}">
+                <a class="nav-link" href="{% url 'progress:user_progress' user.id %}">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                    <span>{% if user.is_risk_admin %}Team Progress{% else %}My Progress{% endif %}</span></a>
+            </li>
+
+            <!-- Nav Item - Certificates -->
+            <li class="nav-item {% block nav_certificates %}{% endblock %}">
+                <a class="nav-link" href="{% url 'certificates:my_certificates' %}">
+                    <i class="fas fa-fw fa-award"></i>
+                    <span>{% if user.is_risk_admin %}All Certificates{% else %}My Certificates{% endif %}</span></a>
+            </li>
+
+            {% if user.is_risk_admin %}
+            <!-- Risk Analytics -->
+            <li class="nav-item {% block nav_analytics %}{% endblock %}">
+                <a class="nav-link" href="#" onclick="alert('Risk Analytics Dashboard - Coming Soon!')">
+                    <i class="fas fa-fw fa-analytics"></i>
+                    <span>Risk Analytics</span></a>
+            </li>
+
+            <!-- Audit Trail -->
+            <li class="nav-item {% block nav_audit %}{% endblock %}">
+                <a class="nav-link" href="{% url 'content:dashboard' %}">
+                    <i class="fas fa-fw fa-history"></i>
+                    <span>Management Console</span></a>
+            </li>
+            {% endif %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        {% endif %}
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                {% if user.is_authenticated %}
+                <nav class="navbar navbar-expand topbar mb-4 static-top shadow" style="background: linear-gradient(90deg, #002B5C 0%, #0052CC 50%, #00A651 100%) !important; border-bottom: 3px solid #00A651;">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" style="color: white;">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="{% if user.is_risk_admin %}Search courses, users, or content...{% else %}Search training courses...{% endif %}" aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        {% if user.is_risk_admin %}
+                        <!-- Nav Item - Alerts -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <span class="badge badge-danger badge-counter">3+</span>
+                            </a>
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                                <h6 class="dropdown-header">Compliance Alerts</h6>
+                                <a class="dropdown-item d-flex align-items-center" href="{% url 'progress:user_progress' user.id %}">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-warning">
+                                            <i class="fas fa-exclamation-triangle text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 12, 2025</div>
+                                        <span class="font-weight-bold">3 employees have overdue training</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center" href="{% url 'certificates:my_certificates' %}">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-certificate text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 11, 2025</div>
+                                        <span class="font-weight-bold">5 certificates pending approval</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="{% url 'content:dashboard' %}">Show All Alerts</a>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Compliance Status -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="complianceDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-clipboard-check fa-fw"></i>
+                                <span class="badge badge-success badge-counter">85%</span>
+                            </a>
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="complianceDropdown">
+                                <h6 class="dropdown-header">Compliance Overview</h6>
+                                <div class="dropdown-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Overall Compliance:</span>
+                                        <strong class="text-success">85%</strong>
+                                    </div>
+                                    <div class="progress mt-1">
+                                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center small text-gray-500" href="{% url 'progress:user_progress' user.id %}">View Detailed Report</a>
+                            </div>
+                        </li>
+                        {% endif %}
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-white small">{{ user.get_full_name }}</span>
+                                <i class="fas fa-user-circle fa-2x" style="color: rgba(255,255,255,0.8);"></i>
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                {% endif %}
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    {% block page_heading %}{% endblock %}
+
+                    <!-- Content Row -->
+                    {% block content %}{% endblock %}
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span> Co-operative Bank Tanzania PLC &copy; 2025 | 
+                        {% if user.is_risk_admin %}
+                            <a href="{% url 'content:dashboard' %}" class="text-primary">Management Console</a> |
+                        {% endif %}
+                        <a href="{% url 'accounts:profile' %}" class="text-primary">My Profile</a></span>
+                        <br><small class="text-muted">Designed by Martin Malopa</small>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="{% url 'accounts:logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,709 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Risk LMS{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block page_heading %}
+<!-- Welcome Banner -->
+<div class="welcome-banner mb-4">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h4><i class="fas fa-hand-sparkles mr-2"></i>Welcome back, {{ user.first_name|default:user.username }}!</h4>
+            <p class="mb-0">
+                {% if user.is_risk_admin %}
+                    <i class="fas fa-shield-alt mr-1"></i> Risk & Compliance Management Portal | Co-operative Bank of Tanzania
+                {% else %}
+                    <i class="fas fa-graduation-cap mr-1"></i> Continue your training journey | Co-operative Bank of Tanzania
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-none d-md-block">
+            {% if user.is_risk_admin %}
+            <a href="{% url 'content:upload_course' %}" class="btn btn-light">
+                <i class="fas fa-plus"></i> Create Course
+            </a>
+            {% else %}
+            <a href="{% url 'courses:course_list' %}" class="btn btn-light">
+                <i class="fas fa-play-circle"></i> Continue Learning
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+        {% if user.is_risk_admin %}Risk & Compliance Dashboard{% else %}My Training Dashboard{% endif %}
+    </h1>
+    {% if user.is_risk_admin %}
+    <a href="{% url 'content:upload_course' %}" class="btn btn-primary d-md-none">
+        <i class="fas fa-plus"></i> Create New Course
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_risk_admin %}
+<!-- Risk & Compliance Management Dashboard -->
+<div class="row">
+    <!-- Compliance Rate Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Compliance Rate (Certified)</div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ compliance_rate }}%</div>
+                            </div>
+                            <div class="col">
+                                <div class="progress progress-sm mr-2">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ compliance_rate }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ total_certificates }}/{{ total_bankers }} staff certified</small>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Staff / Active Learners Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Staff (AD Users)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_bankers }}</div>
+                        <small class="text-muted">{{ total_enrollments }} enrolled, {{ not_enrolled }} not started</small>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- In Progress Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Currently In Progress</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users_in_progress }}</div>
+                        <small class="text-muted">Staff currently taking courses</small>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Certifications Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Pending Certifications</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_certifications }}</div>
+                        <small class="text-muted">Completed content, awaiting quiz</small>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Management Dashboard -->
+<div class="row">
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-area"></i> Enrollment & Completion Overview
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow">
+                        <a class="dropdown-item" href="{% url 'progress:course_analytics' %}">Detailed Analytics</a>
+                        <a class="dropdown-item" href="{% url 'certificates:my_certificates' %}">Manage Certificates</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'content:enrollment_report' %}">Export to Excel</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Staff Status Distribution -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-3">
+                        <div class="border rounded p-3" style="background-color: #e8f5e9;">
+                            <h3 class="text-success mb-0">{{ total_certificates }}</h3>
+                            <small class="text-muted">Certified</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3" style="background-color: #e3f2fd;">
+                            <h3 class="text-info mb-0">{{ users_in_progress }}</h3>
+                            <small class="text-muted">In Progress</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3" style="background-color: #fff3e0;">
+                            <h3 class="text-warning mb-0">{{ pending_certifications }}</h3>
+                            <small class="text-muted">Awaiting Quiz</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="border rounded p-3" style="background-color: #ffebee;">
+                            <h3 class="text-danger mb-0">{{ not_enrolled }}</h3>
+                            <small class="text-muted">Not Started</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Compliance Progress Bar -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span><strong>Overall Compliance Rate</strong></span>
+                        <span class="text-success font-weight-bold">{{ compliance_rate }}%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ compliance_rate }}%">
+                            {{ total_certificates }} Certified
+                        </div>
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {% widthratio users_in_progress total_bankers 100 %}%">
+                        </div>
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: {% widthratio pending_certifications total_bankers 100 %}%">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ total_certificates }} certified out of {{ total_bankers }} total staff</small>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'progress:course_analytics' %}" class="btn btn-primary">
+                        <i class="fas fa-chart-bar mr-2"></i>View Detailed Analytics
+                    </a>
+                    <a href="{% url 'content:enrollment_report' %}" class="btn btn-success ml-2">
+                        <i class="fas fa-file-excel mr-2"></i>Export Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-bell"></i> Quick Stats
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Total Staff (AD Users)</span>
+                        <span class="badge badge-primary" style="padding: 8px 12px;">{{ total_bankers }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Enrolled in Courses</span>
+                        <span class="badge badge-info" style="padding: 8px 12px;">{{ total_enrollments }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Certified (Passed Quiz)</span>
+                        <span class="badge badge-success" style="padding: 8px 12px;">{{ total_certificates }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Haven't Started</span>
+                        <span class="badge badge-danger" style="padding: 8px 12px;">{{ not_enrolled }}</span>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <h6 class="text-muted mb-2">Training Modules</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ total_courses }}</h4>
+                            <small>Courses</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info">{{ total_questions }}</h4>
+                            <small>Questions</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'progress:course_analytics' %}" class="btn btn-primary btn-sm btn-block">
+                        <i class="fas fa-chart-bar"></i> View Full Analytics Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Content Management -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-plus-circle"></i> Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <a href="{% url 'content:upload_course' %}" class="btn btn-outline-primary btn-sm btn-block">
+                            <i class="fas fa-book"></i><br><small>Course</small>
+                        </a>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <a href="{% url 'content:dashboard' %}" class="btn btn-outline-success btn-sm btn-block">
+                            <i class="fas fa-video"></i><br><small>Video</small>
+                        </a>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <a href="{% url 'content:dashboard' %}" class="btn btn-outline-info btn-sm btn-block">
+                            <i class="fas fa-question"></i><br><small>Question</small>
+                        </a>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <a href="{% url 'progress:course_analytics' %}" class="btn btn-outline-warning btn-sm btn-block">
+                            <i class="fas fa-chart-bar"></i><br><small>Analytics</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Courses -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">All Courses</h6>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Course Title</th>
+                                <th>Enrollments</th>
+                                <th>Videos</th>
+                                <th>Questions</th>
+                                <th>Passing Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td>{{ course.title }}</td>
+                                <td><span class="badge badge-primary">{{ course.enrollments.count }}</span></td>
+                                <td><span class="badge badge-success">{{ course.videos.count }}</span></td>
+                                <td><span class="badge badge-info">{{ course.questions.count }}</span></td>
+                                <td>{{ course.passing_score }}%</td>
+                                <td>
+                                    {% if user.is_risk_admin %}
+                                    <a href="{% url 'content:edit_course' course.id %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-cog"></i> Settings
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">No courses available. <a href="{% url 'content:upload_course' %}">Create your first course</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Banker Dashboard -->
+<div class="row">
+    <!-- Enrolled Courses Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Enrolled Courses</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ enrolled_courses.count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Videos Completed Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Videos Completed</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ videos_completed }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quizzes Passed Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Quizzes Passed</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ quizzes_passed }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificates Earned Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Certificates</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ certificates_earned }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-certificate fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overall Progress Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Overall Progress</div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ overall_progress|floatformat:0 }}%</div>
+                            </div>
+                            <div class="col">
+                                <div class="progress progress-sm mr-2">
+                                    <div class="progress-bar bg-info" role="progressbar" 
+                                         style="width: {{ overall_progress }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-pie fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Progress Details -->
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Course Progress Summary
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if course_progress_data %}
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Videos</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for progress in course_progress_data %}
+                            <tr>
+                                <td>
+                                    <div class="font-weight-bold text-primary">{{ progress.course.title }}</div>
+                                    <small class="text-muted">{{ progress.course.description|truncatewords:10 }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">{{ progress.completed_videos }} / {{ progress.total_videos }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="mr-2">{{ progress.progress_percentage|floatformat:0 }}%</span>
+                                        <div class="progress flex-grow-1" style="height: 8px; width: 100px;">
+                                            <div class="progress-bar {% if progress.progress_percentage >= 100 %}bg-success{% elif progress.progress_percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ progress.progress_percentage }}%">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if progress.progress_percentage >= 100 %}
+                                        <span class="badge badge-success">Completed</span>
+                                    {% elif progress.progress_percentage > 0 %}
+                                        <span class="badge badge-warning">In Progress</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Not Started</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-book fa-3x text-gray-300 mb-3"></i>
+                    <h5 class="text-gray-500">No Courses Enrolled</h5>
+                    <p class="text-gray-400">Enroll in courses to track your progress</p>
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Browse Courses</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Courses -->
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">My Courses</h6>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-sm btn-primary">Browse All Courses</a>
+            </div>
+            <div class="card-body">
+                {% if enrolled_courses %}
+                <div class="row">
+                    {% for enrollment in enrolled_courses %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                <p class="card-text text-gray-600">{{ enrollment.course.description|truncatewords:20 }}</p>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mb-2">
+                                    <small class="text-gray-600">Course Progress</small>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%">0%</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'courses:course_detail' enrollment.course.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-arrow-right"></i> Continue Learning
+                                    </a>
+                                    <small class="text-muted">Enrolled: {{ enrollment.enrolled_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-3x text-gray-300 mb-3"></i>
+                    <p class="text-gray-600">You haven't enrolled in any courses yet.</p>
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Browse Available Courses</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if user.is_risk_admin %}
+<script>
+// Risk Dashboard Interactive Features
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Animate counter numbers
+    function animateCounters() {
+        const counters = document.querySelectorAll('.h5.mb-0.font-weight-bold.text-gray-800');
+        counters.forEach(counter => {
+            const target = parseInt(counter.textContent.replace(/[^\d]/g, ''));
+            let current = 0;
+            const increment = target / 30;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    counter.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    counter.textContent = Math.floor(current);
+                }
+            }, 50);
+        });
+    }
+    
+    // Initialize counter animation
+    setTimeout(animateCounters, 500);
+    
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.transition = 'transform 0.2s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Real-time clock for dashboard
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        const dateString = now.toLocaleDateString();
+        
+        // Add clock to navbar if it doesn't exist
+        if (!document.getElementById('dashboard-clock')) {
+            const navbar = document.querySelector('.navbar-nav.ml-auto');
+            if (navbar) {
+                const clockLi = document.createElement('li');
+                clockLi.className = 'nav-item d-none d-sm-inline-block';
+                clockLi.innerHTML = `
+                    <div class="nav-link" id="dashboard-clock">
+                        <small class="text-muted">${dateString}</small><br>
+                        <strong>${timeString}</strong>
+                    </div>
+                `;
+                navbar.insertBefore(clockLi, navbar.firstChild);
+            }
+        } else {
+            document.getElementById('dashboard-clock').innerHTML = `
+                <small class="text-muted">${dateString}</small><br>
+                <strong>${timeString}</strong>
+            `;
+        }
+    }
+    
+    // Update clock every second
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Add quick search functionality
+    const searchInput = document.querySelector('input[placeholder*="Search"]');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = this.value.toLowerCase();
+                
+                // Simple client-side filtering of visible content
+                if (query) {
+                    // Highlight matching course titles
+                    const courseTitles = document.querySelectorAll('.card-title');
+                    courseTitles.forEach(title => {
+                        if (title.textContent.toLowerCase().includes(query)) {
+                            title.parentElement.parentElement.parentElement.style.border = '2px solid #4e73df';
+                            title.parentElement.parentElement.parentElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        } else {
+                            title.parentElement.parentElement.parentElement.style.border = '';
+                        }
+                    });
+                }
+            }
+        });
+    }
+    
+    // Add notification for compliance alerts
+    function showComplianceNotification() {
+        const alertBadge = document.querySelector('.badge-counter');
+        if (alertBadge) {
+            setInterval(() => {
+                alertBadge.style.animation = 'pulse 2s infinite';
+            }, 10000);
+        }
+    }
+    
+    showComplianceNotification();
+});
+
+// CSS for pulse animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endif %}
+{% endblock %}

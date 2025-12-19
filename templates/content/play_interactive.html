@@ -1,0 +1,1345 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ interactive_course.title }} - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-player-container {
+        background: #1a1a2e;
+        min-height: calc(100vh - 200px);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .player-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+    }
+    
+    .player-iframe-container {
+        position: relative;
+        width: 100%;
+        background: #000;
+        min-height: 500px;
+    }
+    
+    .player-controls {
+        background: #2d2d44;
+        padding: 15px 20px;
+        color: white;
+    }
+    
+    .progress-tracker {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        height: 8px;
+        overflow: hidden;
+    }
+    
+    .progress-tracker .progress-fill {
+        background: linear-gradient(90deg, #00c853, #64dd17);
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+    
+    .course-info-panel {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .completion-badge {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: bold;
+    }
+    
+    .slide-tracker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 10px;
+    }
+    
+    .slide-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .slide-dot.completed {
+        background: #00c853;
+    }
+    
+    .slide-dot.current {
+        background: #ffc107;
+        transform: scale(1.3);
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    
+    .slide-dot.locked {
+        background: rgba(255,255,255,0.1);
+        cursor: not-allowed;
+    }
+    
+    .launch-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 40px;
+    }
+    
+    .launch-icon {
+        width: 120px;
+        height: 120px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .rules-list {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 20px 25px;
+        margin-top: 25px;
+        text-align: left;
+        max-width: 500px;
+    }
+    
+    .rules-list li {
+        margin-bottom: 10px;
+        padding-left: 10px;
+    }
+    
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-in-progress {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+    
+    .quiz-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 25px;
+        color: white;
+        margin-top: 20px;
+    }
+    
+    .certificate-preview {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border-radius: 10px;
+        padding: 30px;
+        color: white;
+        text-align: center;
+    }
+    
+    .circular-progress {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+    
+    .circular-progress svg {
+        transform: rotate(-90deg);
+    }
+    
+    .circular-progress-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-transparent p-0 mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'courses:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.id %}">{{ course.title|truncatewords:3 }}</a></li>
+                    <li class="breadcrumb-item active">{{ interactive_course.title|truncatewords:3 }}</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-laptop-code text-primary"></i> {{ interactive_course.title }}
+            </h1>
+        </div>
+        <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Main Player Area -->
+        <div class="col-lg-9">
+            <div class="course-player-container shadow">
+                <!-- Player Header -->
+                <div class="player-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">{{ interactive_course.title }}</h5>
+                        <small class="opacity-75">
+                            <i class="fas fa-clock"></i> {{ interactive_course.get_duration_display }}
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-layer-group"></i> {{ interactive_course.total_slides }} slides
+                        </small>
+                    </div>
+                    <div>
+                        {% if progress.is_completed %}
+                        <span class="completion-badge">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </span>
+                        {% else %}
+                        <span class="status-indicator status-in-progress">
+                            <i class="fas fa-spinner fa-spin"></i> In Progress - {{ progress.completion_percentage }}%
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Launch Course Section -->
+                <div class="launch-section text-white" id="launchSection">
+                    <div class="launch-icon">
+                        <i class="fas fa-play-circle fa-4x"></i>
+                    </div>
+                    
+                    <h3 class="mb-3">{{ interactive_course.title }}</h3>
+                    
+                    <div class="mb-4">
+                        <span class="badge badge-light px-3 py-2 mr-2">
+                            <i class="fas fa-clock"></i> {{ interactive_course.get_duration_display }}
+                        </span>
+                        <span class="badge badge-light px-3 py-2 mr-2">
+                            <i class="fas fa-layer-group"></i> {{ interactive_course.total_slides }} Slides
+                        </span>
+                        {% if interactive_course.resolution_width %}
+                        <span class="badge badge-light px-3 py-2">
+                            <i class="fas fa-desktop"></i> {{ interactive_course.resolution_width }}×{{ interactive_course.resolution_height }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if progress.highest_slide_reached > 0 and not progress.is_completed %}
+                    <p class="mb-3 text-warning">
+                        <i class="fas fa-bookmark"></i> You've completed {{ progress.highest_slide_reached }} of {{ interactive_course.total_slides }} slides
+                    </p>
+                    {% endif %}
+                    
+                    <button class="btn btn-primary btn-lg px-5 py-3" id="launchBtn" onclick="startCourse()">
+                        <i class="fas fa-play mr-2"></i> 
+                        {% if progress.highest_slide_reached > 0 and not progress.is_completed %}
+                            Resume Course
+                        {% else %}
+                            Start Course
+                        {% endif %}
+                    </button>
+                    
+                    <div class="rules-list">
+                        <h6 class="font-weight-bold mb-3"><i class="fas fa-exclamation-triangle text-warning"></i> Important Rules</h6>
+                        <ul class="mb-0">
+                            <li><i class="fas fa-ban text-danger mr-2"></i> <strong>No Skipping:</strong> Progress is tracked automatically as you navigate</li>
+                            <li><i class="fas fa-eye text-info mr-2"></i> <strong>Complete Each Slide:</strong> The course tracks when you advance to each slide</li>
+                            <li><i class="fas fa-clipboard-check text-success mr-2"></i> <strong>Quiz Required:</strong> Pass the assessment with 80%+ to complete</li>
+                            <li><i class="fas fa-certificate text-warning mr-2"></i> <strong>Certificate:</strong> Issued automatically upon successful completion</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Embedded Course Player (hidden until started) -->
+                <div id="coursePlayerSection" style="display: none;">
+                    <div class="course-iframe-container" style="position: relative; background: #000;">
+                        <iframe id="courseIframe" 
+                                src="" 
+                                style="width: 100%; height: 70vh; border: none;"
+                                allowfullscreen>
+                        </iframe>
+                        
+                        <!-- Current Slide Indicator -->
+                        <div id="slideIndicator" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; z-index: 100;">
+                            <i class="fas fa-layer-group"></i> Slide <span id="currentSlideDisplay">1</span> / {{ interactive_course.total_slides }}
+                            <span id="slideTimerBadge" class="ml-2 badge badge-warning" style="display: none;">
+                                <i class="fas fa-clock"></i> <span id="slideTimeRemaining">--</span>s
+                            </span>
+                        </div>
+                        
+                        <!-- Fullscreen Button -->
+                        <button id="fullscreenBtn" onclick="toggleFullscreen()" 
+                                style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; z-index: 100;">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Slide Navigation Controls -->
+                    <div id="slideNavSection" class="py-3 px-4" style="background: #2d2d44;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-white">
+                                <span id="slideStatusText">
+                                    <i class="fas fa-info-circle text-info"></i> 
+                                    Watch the content, then click "Next Slide" when ready
+                                </span>
+                            </div>
+                            <div>
+                                <button id="nextSlideBtn" class="btn btn-success" onclick="advanceToNextSlide()" disabled>
+                                    <i class="fas fa-arrow-right mr-2"></i> Next Slide
+                                    <span id="nextSlideLock" class="ml-2 badge badge-light">
+                                        <i class="fas fa-lock"></i> <span id="unlockCountdown">--</span>s
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Player Controls -->
+                <div class="player-controls">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <span class="mr-3">Progress:</span>
+                                <div class="progress-tracker flex-grow-1">
+                                    <div class="progress-fill" id="progressFill" style="width: {{ progress.completion_percentage }}%;"></div>
+                                </div>
+                                <span class="ml-3" id="progressText">{{ progress.completion_percentage }}%</span>
+                            </div>
+                            
+                            <!-- Slide Dots -->
+                            <div class="slide-tracker" id="slideTracker">
+                                {% for i in slide_range %}
+                                <div class="slide-dot {% if i <= progress.highest_slide_reached %}completed{% endif %} {% if i == progress.current_slide %}current{% endif %} {% if i > progress.highest_slide_reached|add:1 %}locked{% endif %}" 
+                                     title="Slide {{ i }}" data-slide="{{ i }}"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <span class="mr-3 small">
+                                <i class="fas fa-layer-group"></i> 
+                                Slide <span id="currentSlideNum">{{ progress.current_slide|default:0 }}</span> / {{ interactive_course.total_slides }}
+                            </span>
+                            <span class="small">
+                                <i class="fas fa-clock"></i>
+                                <span id="timeSpentDisplay">{{ progress.total_time_spent|default:0 }}</span> min
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quiz Section (shown after completing all slides) -->
+            {% if progress.highest_slide_reached >= interactive_course.total_slides and not progress.quiz_passed %}
+            <div class="quiz-section">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5><i class="fas fa-clipboard-check mr-2"></i> Assessment Required</h5>
+                        <p class="mb-0 opacity-75">You've completed all {{ interactive_course.total_slides }} slides! Now take the quiz to earn your certificate.</p>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <a href="{% url 'quizzes:start_interactive' interactive_course.id %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-play mr-2"></i> Start Quiz
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Certificate Section (shown after passing quiz) -->
+            {% if progress.quiz_passed %}
+            <div class="certificate-preview mt-4">
+                <i class="fas fa-award fa-4x mb-3"></i>
+                <h4>🎉 Congratulations!</h4>
+                <p class="mb-3">You have successfully completed this course with a score of <strong>{{ progress.quiz_score|floatformat:0 }}%</strong></p>
+                <a href="{% url 'certificates:my_certificates' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-download mr-2"></i> View Certificate
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Course Info Sidebar -->
+        <div class="col-lg-3">
+            <!-- Progress Card -->
+            <div class="course-info-panel p-4 mb-4">
+                <h6 class="font-weight-bold text-primary mb-3">
+                    <i class="fas fa-chart-pie"></i> Your Progress
+                </h6>
+                
+                <div class="text-center mb-4">
+                    <div class="circular-progress mx-auto">
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                            <circle cx="60" cy="60" r="54" fill="none" 
+                                    stroke="{% if progress.is_completed %}#28a745{% else %}#007bff{% endif %}" 
+                                    stroke-width="12" stroke-linecap="round"
+                                    stroke-dasharray="339.292"
+                                    stroke-dashoffset="{{ progress_dashoffset|default:'339.292' }}"
+                                    id="progressCircle"/>
+                        </svg>
+                        <div class="circular-progress-value" id="progressPercent">{{ progress.completion_percentage|default:0 }}%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Slides Completed</span>
+                        <strong id="slidesCompleted">{{ progress.highest_slide_reached|default:0 }} / {{ interactive_course.total_slides }}</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Time Spent</span>
+                        <strong id="totalTimeSpent">{{ progress.total_time_spent|default:0 }} min</strong>
+                    </div>
+                </div>
+                
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Status</span>
+                        <span class="badge badge-{% if progress.is_completed %}success{% elif progress.current_slide > 0 %}warning{% else %}secondary{% endif %}">
+                            {% if progress.is_completed %}Completed{% elif progress.current_slide > 0 %}In Progress{% else %}Not Started{% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if progress.quiz_score %}
+                <div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Quiz Score</span>
+                        <strong class="{% if progress.quiz_passed %}text-success{% else %}text-danger{% endif %}">
+                            {{ progress.quiz_score|floatformat:0 }}%
+                            {% if progress.quiz_passed %}<i class="fas fa-check-circle ml-1"></i>{% endif %}
+                        </strong>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Course Requirements -->
+            <div class="course-info-panel p-4 mb-4">
+                <h6 class="font-weight-bold text-warning mb-3">
+                    <i class="fas fa-clipboard-list"></i> Requirements
+                </h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-2 d-flex align-items-start">
+                        <i class="fas fa-{% if progress.highest_slide_reached >= interactive_course.total_slides %}check-circle text-success{% else %}circle text-muted{% endif %} mr-2 mt-1"></i>
+                        <span>Complete all {{ interactive_course.total_slides }} slides</span>
+                    </li>
+                    <li class="mb-2 d-flex align-items-start">
+                        <i class="fas fa-{% if progress.quiz_passed %}check-circle text-success{% else %}circle text-muted{% endif %} mr-2 mt-1"></i>
+                        <span>Pass quiz with 80%+</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="fas fa-{% if progress.quiz_passed %}check-circle text-success{% else %}circle text-muted{% endif %} mr-2 mt-1"></i>
+                        <span>Earn certificate</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Tips -->
+            <div class="course-info-panel p-4">
+                <h6 class="font-weight-bold text-info mb-3">
+                    <i class="fas fa-lightbulb"></i> Tips
+                </h6>
+                <ul class="small mb-0 pl-3">
+                    <li class="mb-2">Complete slides in order - no skipping!</li>
+                    <li class="mb-2">Your progress saves automatically</li>
+                    <li class="mb-2">Take notes for the quiz</li>
+                    <li>You can resume anytime</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Completion Modal -->
+<div class="modal fade" id="completionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                <h4 class="text-success">All Slides Completed!</h4>
+                <p class="text-muted">Great work! You've completed all {{ interactive_course.total_slides }} slides. Now take the quiz to earn your certificate.</p>
+                <a href="{% url 'quizzes:start_interactive' interactive_course.id %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-clipboard-check mr-2"></i> Take Quiz Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- SCORM API Wrapper - Must load before course -->
+<script src="{% static 'js/scorm_api.js' %}"></script>
+
+<script>
+/**
+ * Hybrid Progress Tracking for Captivate Courses
+ * 
+ * This approach combines:
+ * 1. SCORM API - Captures slide changes if Captivate reports them
+ * 2. Time-based unlock - User can manually advance after minimum time on each slide
+ * 3. Resume support - Users can continue from where they left off
+ */
+
+// Course configuration
+const interactiveId = {{ interactive_course.id }};
+const totalSlides = {{ interactive_course.total_slides }};
+const courseDurationMinutes = {{ interactive_course.duration_minutes|default:30 }};
+const csrfToken = '{{ csrf_token }}';
+const launchUrl = '{{ launch_url }}';
+const progressUpdateUrl = '{% url "content:update_interactive_progress" interactive_course.id %}';
+
+// Calculate minimum time per slide (in seconds)
+// Based on course duration, minimum 20 seconds per slide
+const minTimePerSlide = Math.max(20, Math.floor((courseDurationMinutes * 60) / totalSlides));
+
+// Configure SCORM API wrapper
+window.SCORM_CONFIG = {
+    interactiveId: interactiveId,
+    csrfToken: csrfToken,
+    progressUrl: progressUpdateUrl,
+    totalSlides: totalSlides,
+    debug: true
+};
+
+// Progress state (loaded from server)
+let currentSlide = {{ progress.current_slide|default:0 }};
+let highestSlideReached = {{ progress.highest_slide_reached|default:0 }};
+let completionPercentage = {{ progress.completion_percentage|default:0 }};
+let isCompleted = {{ progress.is_completed|yesno:"true,false" }};
+let contentCompleted = {{ progress.content_completed|yesno:"true,false" }};
+let totalTimeSpent = {{ progress.total_time_spent|default:0 }};
+
+// Session state
+let sessionStartTime = null;
+let courseLaunched = false;
+let timeTracker = null;
+let slideTimer = null;
+let slideTimeRemaining = 0;
+let canAdvance = false;
+
+// Start the course - show iframe and begin tracking
+function startCourse() {
+    courseLaunched = true;
+    sessionStartTime = Date.now();
+    
+    // Hide launch section, show player
+    document.getElementById('launchSection').style.display = 'none';
+    document.getElementById('coursePlayerSection').style.display = 'block';
+    
+    // Resume from last position or start at slide 1
+    if (highestSlideReached === 0) {
+        currentSlide = 1;
+        highestSlideReached = 1;
+    } else {
+        // Resume - set current slide to the next one after highest completed
+        // Or stay at highest if not all completed
+        currentSlide = highestSlideReached;
+    }
+    
+    // Load the Captivate course
+    const iframe = document.getElementById('courseIframe');
+    iframe.src = launchUrl;
+    
+    // Inject SCORM API and navigate to resume slide when iframe loads
+    iframe.onload = function() {
+        injectScormApiToIframe(iframe);
+        
+        // If resuming, navigate Captivate to the saved slide after a short delay
+        // (Captivate needs time to initialize)
+        if (highestSlideReached > 1) {
+            setTimeout(function() {
+                goToCaptivateSlide(currentSlide);
+                console.log('[LMS] Navigating Captivate to resume slide:', currentSlide);
+            }, 1500); // Wait 1.5 seconds for Captivate to fully load
+        }
+    };
+    
+    // Start time tracking
+    startTimeTracking();
+    
+    // Start slide timer for current slide
+    startSlideTimer();
+    
+    // Update UI
+    updateProgressUI();
+    updateSlideDisplay(currentSlide);
+    
+    // Show appropriate message
+    if (highestSlideReached > 1) {
+        showToast('📚 Resuming Course', 
+            `You've completed ${highestSlideReached} of ${totalSlides} slides. The course will jump to slide ${currentSlide}.`, 
+            'info');
+    } else {
+        showToast('Course Started', 'Watch the content in the Captivate player. Use the "Next Slide" button below to track your progress.', 'info');
+    }
+}
+
+// Start timer for current slide
+function startSlideTimer() {
+    // Clear existing timer
+    if (slideTimer) {
+        clearInterval(slideTimer);
+    }
+    
+    // Reset button state
+    const nextBtn = document.getElementById('nextSlideBtn');
+    const lockBadge = document.getElementById('nextSlideLock');
+    const statusText = document.getElementById('slideStatusText');
+    
+    // Check if this slide was already completed (currentSlide <= highestSlideReached means it's done)
+    if (currentSlide <= highestSlideReached && currentSlide < totalSlides) {
+        // This slide is already completed - can advance immediately to next
+        canAdvance = true;
+        nextBtn.disabled = false;
+        lockBadge.style.display = 'none';
+        
+        if (currentSlide < highestSlideReached) {
+            statusText.innerHTML = '<i class="fas fa-check-circle text-success"></i> Slide ' + currentSlide + ' completed. Click <strong>Next Slide</strong> to continue.';
+        } else {
+            // currentSlide == highestSlideReached - user is resuming from where they left off
+            statusText.innerHTML = '<i class="fas fa-play-circle text-info"></i> Resuming at slide ' + currentSlide + '. Click <strong>Next Slide</strong> when ready to continue.';
+        }
+        return;
+    }
+    
+    // Check if we've reached the last slide AND it's already completed
+    if (currentSlide >= totalSlides && highestSlideReached >= totalSlides) {
+        canAdvance = false;
+        nextBtn.disabled = true;
+        lockBadge.style.display = 'none';
+        statusText.innerHTML = '<i class="fas fa-trophy text-warning"></i> All slides completed! Take the quiz to earn your certificate.';
+        return;
+    }
+    
+    // Check if we're on the last slide but haven't completed it yet
+    if (currentSlide >= totalSlides) {
+        canAdvance = false;
+        nextBtn.disabled = true;
+        lockBadge.style.display = 'none';
+        statusText.innerHTML = '<i class="fas fa-flag-checkered text-success"></i> Final slide! Watch to complete the course.';
+        
+        // Mark as complete after timer
+        slideTimeRemaining = minTimePerSlide;
+        document.getElementById('slideTimerBadge').style.display = 'inline';
+        document.getElementById('slideTimeRemaining').textContent = slideTimeRemaining;
+        
+        slideTimer = setInterval(function() {
+            slideTimeRemaining--;
+            document.getElementById('slideTimeRemaining').textContent = Math.max(0, slideTimeRemaining);
+            
+            if (slideTimeRemaining <= 0) {
+                clearInterval(slideTimer);
+                document.getElementById('slideTimerBadge').style.display = 'none';
+                markCurrentSlideComplete();
+                statusText.innerHTML = '<i class="fas fa-trophy text-warning"></i> Course content completed! Take the quiz to earn your certificate.';
+                showToast('🎉 Content Complete!', 'All slides finished! Take the quiz to earn your certificate.', 'success');
+                showCompletionModal();
+            }
+        }, 1000);
+        return;
+    }
+    
+    // New slide that hasn't been completed - start countdown
+    canAdvance = false;
+    nextBtn.disabled = true;
+    lockBadge.style.display = 'inline';
+    slideTimeRemaining = minTimePerSlide;
+    
+    document.getElementById('unlockCountdown').textContent = slideTimeRemaining;
+    document.getElementById('slideTimerBadge').style.display = 'inline';
+    document.getElementById('slideTimeRemaining').textContent = slideTimeRemaining;
+    statusText.innerHTML = '<i class="fas fa-hourglass-half text-warning"></i> Watch the content. Next slide unlocks in <strong>' + slideTimeRemaining + '</strong> seconds...';
+    
+    // Start countdown
+    slideTimer = setInterval(function() {
+        slideTimeRemaining--;
+        document.getElementById('unlockCountdown').textContent = Math.max(0, slideTimeRemaining);
+        document.getElementById('slideTimeRemaining').textContent = Math.max(0, slideTimeRemaining);
+        
+        if (slideTimeRemaining <= 0) {
+            clearInterval(slideTimer);
+            slideTimer = null;
+            
+            document.getElementById('slideTimerBadge').style.display = 'none';
+            
+            // Unlock the next button
+            canAdvance = true;
+            nextBtn.disabled = false;
+            lockBadge.style.display = 'none';
+            statusText.innerHTML = '<i class="fas fa-unlock text-success"></i> Slide ' + currentSlide + ' complete! Click <strong>Next Slide</strong> to continue.';
+            
+            showToast('✓ Slide ' + currentSlide + ' Complete', 'Click "Next Slide" to continue to slide ' + (currentSlide + 1), 'success');
+        } else {
+            statusText.innerHTML = '<i class="fas fa-hourglass-half text-warning"></i> Watch the content. Next slide unlocks in <strong>' + slideTimeRemaining + '</strong> seconds...';
+        }
+    }, 1000);
+}
+
+// Advance to next slide
+function advanceToNextSlide() {
+    // Check if we can advance
+    if (!canAdvance) {
+        showToast('⏳ Please Wait', 'Watch the current slide content first.', 'warning');
+        return;
+    }
+    
+    // Check if we're already at the last slide
+    if (currentSlide >= totalSlides) {
+        showToast('Course Complete', 'You have completed all slides! Take the quiz now.', 'success');
+        return;
+    }
+    
+    // Move to next slide
+    currentSlide++;
+    
+    // Update highest reached if this is a new slide
+    if (currentSlide > highestSlideReached) {
+        highestSlideReached = currentSlide;
+    }
+    
+    // Calculate completion percentage based on highest slide reached
+    // We count a slide as complete when user advances past it
+    const completedSlides = Math.max(0, highestSlideReached - 1);
+    completionPercentage = Math.min(100, Math.round((completedSlides / totalSlides) * 100));
+    
+    // If we're on the last slide, mark previous slides as complete
+    if (currentSlide >= totalSlides) {
+        completionPercentage = Math.round(((totalSlides - 1) / totalSlides) * 100);
+    }
+    
+    // **TRIGGER NEXT SLIDE IN CAPTIVATE COURSE**
+    triggerCaptivateNextSlide();
+    
+    // Update UI
+    updateProgressUI();
+    updateSlideDisplay(currentSlide);
+    
+    // Save progress
+    saveProgress();
+    
+    // Start timer for new slide
+    startSlideTimer();
+}
+
+/**
+ * Trigger the next slide in the Captivate course iframe
+ * Captivate exposes several methods to control navigation:
+ * - cpCmndNext (go to next slide)
+ * - cpCmndGotoSlide (go to specific slide)
+ * - cpCmndResume (resume playback)
+ */
+function triggerCaptivateNextSlide() {
+    const iframe = document.getElementById('courseIframe');
+    if (!iframe) return;
+    
+    try {
+        const iframeWindow = iframe.contentWindow;
+        
+        // Method 1: Try Captivate's cpCmndNext variable (most common)
+        if (typeof iframeWindow.cpCmndNext !== 'undefined') {
+            iframeWindow.cpCmndNext = true;
+            console.log('[LMS] Triggered cpCmndNext');
+            return;
+        }
+        
+        // Method 2: Try Captivate's cpAPIInterface (newer versions)
+        if (iframeWindow.cpAPIInterface && typeof iframeWindow.cpAPIInterface.next === 'function') {
+            iframeWindow.cpAPIInterface.next();
+            console.log('[LMS] Triggered cpAPIInterface.next()');
+            return;
+        }
+        
+        // Method 3: Try cpCmndGotoSlide to go to specific slide
+        if (typeof iframeWindow.cpCmndGotoSlide !== 'undefined') {
+            iframeWindow.cpCmndGotoSlide = currentSlide;
+            console.log('[LMS] Triggered cpCmndGotoSlide =', currentSlide);
+            return;
+        }
+        
+        // Method 4: Try to find and click the next button in Captivate
+        const nextBtn = iframeWindow.document.querySelector('[id*="next"], [id*="Next"], .cp-next, [class*="next"]');
+        if (nextBtn) {
+            nextBtn.click();
+            console.log('[LMS] Clicked Captivate next button');
+            return;
+        }
+        
+        // Method 5: Try postMessage API
+        iframeWindow.postMessage({ type: 'cpNavigate', action: 'next', slide: currentSlide }, '*');
+        console.log('[LMS] Sent postMessage to navigate');
+        
+        // Method 6: Try invoking Captivate's movie control
+        if (iframeWindow.cp && iframeWindow.cp.movie) {
+            iframeWindow.cp.movie.cpCmndNext = true;
+            console.log('[LMS] Triggered cp.movie.cpCmndNext');
+            return;
+        }
+        
+        // Method 7: Try setting slide via cpInfoCurrentSlide
+        if (typeof iframeWindow.cpInfoCurrentSlide !== 'undefined') {
+            // Read current and set next
+            const captivateCurrentSlide = iframeWindow.cpInfoCurrentSlide;
+            if (iframeWindow.cpCmndGotoSlide !== undefined) {
+                iframeWindow.cpCmndGotoSlide = captivateCurrentSlide + 1;
+            }
+        }
+        
+    } catch (e) {
+        console.warn('[LMS] Could not control Captivate directly (cross-origin):', e.message);
+        // Try postMessage as fallback
+        try {
+            iframe.contentWindow.postMessage({ 
+                type: 'lmsNavigate', 
+                action: 'nextSlide',
+                targetSlide: currentSlide 
+            }, '*');
+        } catch (e2) {
+            console.warn('[LMS] PostMessage also failed:', e2.message);
+        }
+    }
+}
+
+/**
+ * Go to a specific slide in Captivate
+ */
+function goToCaptivateSlide(slideNumber) {
+    const iframe = document.getElementById('courseIframe');
+    if (!iframe) return;
+    
+    try {
+        const iframeWindow = iframe.contentWindow;
+        
+        // Captivate uses 0-based indexing internally
+        const captivateSlideIndex = slideNumber - 1;
+        
+        // Try cpCmndGotoSlide
+        if (typeof iframeWindow.cpCmndGotoSlide !== 'undefined') {
+            iframeWindow.cpCmndGotoSlide = captivateSlideIndex;
+            console.log('[LMS] Going to slide', slideNumber, '(index:', captivateSlideIndex, ')');
+            return;
+        }
+        
+        // Try cpAPIInterface
+        if (iframeWindow.cpAPIInterface && typeof iframeWindow.cpAPIInterface.gotoSlide === 'function') {
+            iframeWindow.cpAPIInterface.gotoSlide(captivateSlideIndex);
+            return;
+        }
+        
+    } catch (e) {
+        console.warn('[LMS] Could not navigate to slide:', e.message);
+    }
+}
+
+// Mark current slide as complete
+function markCurrentSlideComplete() {
+    if (currentSlide > highestSlideReached) {
+        highestSlideReached = currentSlide;
+    }
+    completionPercentage = Math.min(100, Math.round((highestSlideReached / totalSlides) * 100));
+    
+    // Check if all slides completed
+    if (highestSlideReached >= totalSlides && !contentCompleted) {
+        contentCompleted = true;
+    }
+    
+    saveProgress();
+}
+
+// Inject SCORM API into the iframe's content window
+function injectScormApiToIframe(iframe) {
+    try {
+        const iframeWindow = iframe.contentWindow;
+        iframeWindow.API = createScormApi();
+        iframeWindow.API_1484_11 = createScorm2004Api();
+        console.log('[LMS] SCORM API injected into iframe');
+    } catch (e) {
+        console.warn('[LMS] Could not inject SCORM API directly (cross-origin). Using parent window API.');
+    }
+}
+
+// Create SCORM 1.2 API object
+function createScormApi() {
+    return {
+        LMSInitialize: function(param) {
+            console.log('[SCORM 1.2] LMSInitialize');
+            return 'true';
+        },
+        LMSFinish: function(param) {
+            console.log('[SCORM 1.2] LMSFinish');
+            onCourseFinished();
+            return 'true';
+        },
+        LMSGetValue: function(element) {
+            console.log('[SCORM 1.2] LMSGetValue:', element);
+            return getScormValue(element);
+        },
+        LMSSetValue: function(element, value) {
+            console.log('[SCORM 1.2] LMSSetValue:', element, '=', value);
+            return setScormValue(element, value);
+        },
+        LMSCommit: function(param) {
+            console.log('[SCORM 1.2] LMSCommit');
+            saveProgress();
+            return 'true';
+        },
+        LMSGetLastError: function() { return '0'; },
+        LMSGetErrorString: function(code) { return 'No error'; },
+        LMSGetDiagnostic: function(code) { return 'No error'; }
+    };
+}
+
+// Create SCORM 2004 API object
+function createScorm2004Api() {
+    return {
+        Initialize: function(param) {
+            console.log('[SCORM 2004] Initialize');
+            return 'true';
+        },
+        Terminate: function(param) {
+            console.log('[SCORM 2004] Terminate');
+            onCourseFinished();
+            return 'true';
+        },
+        GetValue: function(element) {
+            console.log('[SCORM 2004] GetValue:', element);
+            return getScormValue(element);
+        },
+        SetValue: function(element, value) {
+            console.log('[SCORM 2004] SetValue:', element, '=', value);
+            return setScormValue(element, value);
+        },
+        Commit: function(param) {
+            console.log('[SCORM 2004] Commit');
+            saveProgress();
+            return 'true';
+        },
+        GetLastError: function() { return '0'; },
+        GetErrorString: function(code) { return 'No error'; },
+        GetDiagnostic: function(code) { return 'No error'; }
+    };
+}
+
+// SCORM data storage - initialized with saved progress from server
+// These values are returned to Captivate when it calls LMSGetValue
+const savedSlide = {{ progress.highest_slide_reached|default:0 }};
+const savedSuspendData = '{{ progress.scorm_suspend_data|default:""|escapejs }}';
+
+const scormData = {
+    // SCORM 1.2 elements
+    'cmi.core.lesson_location': savedSlide > 0 ? String(savedSlide) : '',
+    'cmi.core.lesson_status': '{% if progress.content_completed %}completed{% elif progress.highest_slide_reached > 0 %}incomplete{% else %}not attempted{% endif %}',
+    'cmi.core.score.raw': '{{ progress.quiz_score|default:"" }}',
+    'cmi.core.entry': savedSlide > 0 ? 'resume' : 'ab-initio',
+    'cmi.core.exit': '',
+    'cmi.core.credit': 'credit',
+    'cmi.core.lesson_mode': 'normal',
+    'cmi.suspend_data': savedSuspendData,
+    'cmi.launch_data': '',
+    
+    // SCORM 2004 elements
+    'cmi.location': savedSlide > 0 ? String(savedSlide) : '',
+    'cmi.completion_status': '{% if progress.content_completed %}completed{% elif progress.highest_slide_reached > 0 %}incomplete{% else %}not attempted{% endif %}',
+    'cmi.entry': savedSlide > 0 ? 'resume' : 'ab-initio',
+    'cmi.exit': '',
+    'cmi.mode': 'normal',
+    'cmi.credit': 'credit'
+};
+
+// Get SCORM value - returns saved progress to Captivate
+function getScormValue(element) {
+    const value = scormData[element];
+    console.log('[SCORM] GetValue:', element, '=', value);
+    return value !== undefined ? String(value) : '';
+}
+
+// Set SCORM value - capture slide changes from Captivate
+function setScormValue(element, value) {
+    scormData[element] = value;
+    
+    // Track lesson_location (slide number) from SCORM
+    if (element === 'cmi.core.lesson_location' || element === 'cmi.location') {
+        const slideNum = parseSlideNumber(value);
+        if (slideNum > 0) {
+            onScormSlideChange(slideNum);
+        }
+    }
+    
+    // Track completion status
+    if (element === 'cmi.core.lesson_status' || element === 'cmi.completion_status') {
+        if (value === 'completed' || value === 'passed') {
+            onCourseCompleted();
+        }
+    }
+    
+    // Track suspend_data (Captivate stores its resume state here)
+    if (element === 'cmi.suspend_data') {
+        // Save suspend_data to server for resume
+        saveSuspendData(value);
+    }
+    
+    // Track exit status
+    if (element === 'cmi.core.exit' || element === 'cmi.exit') {
+        if (value === 'suspend') {
+            // User wants to resume later - save state
+            saveProgress();
+        }
+    }
+    
+    return 'true';
+}
+
+// Parse slide number from various formats
+function parseSlideNumber(location) {
+    if (!location) return 0;
+    
+    if (/^\d+$/.test(String(location))) {
+        return parseInt(location, 10);
+    }
+    
+    let match = String(location).match(/slide[_]?(\d+)/i);
+    if (match) return parseInt(match[1], 10);
+    
+    match = String(location).match(/m\d+s(\d+)/i);
+    if (match) return parseInt(match[1], 10);
+    
+    match = String(location).match(/frame[_]?(\d+)/i);
+    if (match) return parseInt(match[1], 10);
+    
+    match = String(location).match(/(\d+)/);
+    if (match) return parseInt(match[1], 10);
+    
+    return 0;
+}
+
+// Called when SCORM reports a slide change (auto-advance)
+function onScormSlideChange(slideNum) {
+    console.log('[LMS] SCORM slide change detected:', slideNum);
+    
+    // If SCORM reports we moved to a new slide, auto-advance
+    if (slideNum > currentSlide) {
+        // Mark current slide complete
+        if (currentSlide >= highestSlideReached) {
+            highestSlideReached = currentSlide;
+        }
+        
+        // Update to new slide
+        currentSlide = slideNum;
+        if (slideNum > highestSlideReached) {
+            highestSlideReached = slideNum;
+        }
+        
+        completionPercentage = Math.min(100, Math.round((highestSlideReached / totalSlides) * 100));
+        
+        updateProgressUI();
+        updateSlideDisplay(slideNum);
+        saveProgress();
+        
+        // Restart timer for new slide
+        startSlideTimer();
+        
+        // Check completion
+        if (highestSlideReached >= totalSlides && !contentCompleted) {
+            contentCompleted = true;
+            setTimeout(() => {
+                showToast('🎉 All Slides Completed!', 'Take the quiz to earn your certificate.', 'success');
+                showCompletionModal();
+            }, 1000);
+        }
+    }
+}
+
+// Called when course reports completion
+function onCourseCompleted() {
+    console.log('[LMS] Course completion detected');
+    contentCompleted = true;
+    highestSlideReached = totalSlides;
+    completionPercentage = 100;
+    updateProgressUI();
+    saveProgress();
+}
+
+// Called when course finishes
+function onCourseFinished() {
+    console.log('[LMS] Course finished signal received');
+    saveProgress();
+}
+
+// Update the slide display indicator
+function updateSlideDisplay(slideNum) {
+    document.getElementById('currentSlideDisplay').textContent = slideNum;
+    document.getElementById('currentSlideNum').textContent = slideNum;
+}
+
+// Start time tracking
+function startTimeTracking() {
+    timeTracker = setInterval(function() {
+        totalTimeSpent++;
+        
+        if (totalTimeSpent % 60 === 0) {
+            const minutes = Math.floor(totalTimeSpent / 60);
+            document.getElementById('totalTimeSpent').textContent = minutes + ' min';
+            document.getElementById('timeSpentDisplay').textContent = minutes;
+        }
+        
+        // Also poll Captivate for current slide every 2 seconds
+        if (totalTimeSpent % 2 === 0) {
+            pollCaptivateSlide();
+        }
+    }, 1000);
+}
+
+// Poll Captivate to check current slide (backup sync method)
+let lastPolledSlide = 0;
+function pollCaptivateSlide() {
+    const iframe = document.getElementById('courseIframe');
+    if (!iframe) return;
+    
+    try {
+        const iframeWindow = iframe.contentWindow;
+        
+        // Try to read Captivate's current slide variable
+        let captivateSlide = 0;
+        
+        // Method 1: cpInfoCurrentSlide (most common)
+        if (typeof iframeWindow.cpInfoCurrentSlide !== 'undefined') {
+            captivateSlide = parseInt(iframeWindow.cpInfoCurrentSlide) + 1; // Captivate is 0-indexed
+        }
+        // Method 2: cpAPIInterface
+        else if (iframeWindow.cpAPIInterface && typeof iframeWindow.cpAPIInterface.getCurrentSlideIndex === 'function') {
+            captivateSlide = iframeWindow.cpAPIInterface.getCurrentSlideIndex() + 1;
+        }
+        // Method 3: cp.movie
+        else if (iframeWindow.cp && iframeWindow.cp.movie && typeof iframeWindow.cp.movie.cpInfoCurrentSlide !== 'undefined') {
+            captivateSlide = parseInt(iframeWindow.cp.movie.cpInfoCurrentSlide) + 1;
+        }
+        
+        // If Captivate reports a different slide than we're tracking, sync up
+        if (captivateSlide > 0 && captivateSlide !== lastPolledSlide) {
+            lastPolledSlide = captivateSlide;
+            console.log('[LMS] Polled Captivate slide:', captivateSlide, 'Our slide:', currentSlide);
+            
+            // If Captivate is ahead of our tracking, sync up
+            if (captivateSlide > currentSlide) {
+                console.log('[LMS] Captivate advanced - syncing LMS');
+                onScormSlideChange(captivateSlide);
+            }
+        }
+    } catch (e) {
+        // Cross-origin - can't poll, rely on SCORM
+    }
+}
+
+// Toggle fullscreen
+function toggleFullscreen() {
+    const iframe = document.getElementById('courseIframe');
+    if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+    } else if (iframe.webkitRequestFullscreen) {
+        iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) {
+        iframe.msRequestFullscreen();
+    }
+}
+
+// Save suspend_data (Captivate's internal resume state)
+function saveSuspendData(suspendData) {
+    fetch(progressUpdateUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            scorm_suspend_data: suspendData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('[LMS] Suspend data saved');
+    })
+    .catch(error => console.error('[LMS] Failed to save suspend data:', error));
+}
+
+// Save progress to server
+function saveProgress() {
+    fetch(progressUpdateUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            completion_percentage: completionPercentage,
+            current_slide: currentSlide,
+            highest_slide_reached: highestSlideReached,
+            time_spent: Math.max(1, Math.floor((Date.now() - sessionStartTime) / 60000)),
+            total_slides: totalSlides,
+            content_completed: contentCompleted,
+            scorm_suspend_data: scormData['cmi.suspend_data'] || ''
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('[LMS] Progress saved:', data);
+            if (data.total_time_spent !== undefined) {
+                document.getElementById('totalTimeSpent').textContent = data.total_time_spent + ' min';
+                document.getElementById('timeSpentDisplay').textContent = data.total_time_spent;
+            }
+        }
+    })
+    .catch(error => console.error('[LMS] Failed to save progress:', error));
+}
+
+// Update progress UI elements
+function updateProgressUI() {
+    document.getElementById('progressFill').style.width = completionPercentage + '%';
+    document.getElementById('progressText').textContent = completionPercentage + '%';
+    document.getElementById('progressPercent').textContent = completionPercentage + '%';
+    
+    const circle = document.getElementById('progressCircle');
+    if (circle) {
+        const circumference = 339.292;
+        const offset = circumference - (completionPercentage / 100 * circumference);
+        circle.style.strokeDashoffset = offset;
+    }
+    
+    document.getElementById('currentSlideNum').textContent = currentSlide || highestSlideReached || 0;
+    document.getElementById('slidesCompleted').textContent = highestSlideReached + ' / ' + totalSlides;
+    
+    const dots = document.querySelectorAll('.slide-dot');
+    dots.forEach((dot, index) => {
+        const slideNum = index + 1;
+        dot.classList.remove('completed', 'current', 'locked');
+        
+        if (slideNum <= highestSlideReached) {
+            dot.classList.add('completed');
+        }
+        if (slideNum === currentSlide) {
+            dot.classList.add('current');
+        }
+        if (slideNum > highestSlideReached + 1) {
+            dot.classList.add('locked');
+        }
+    });
+}
+
+// Show completion modal
+function showCompletionModal() {
+    $('#completionModal').modal('show');
+}
+
+// Show toast notification
+function showToast(title, message, type = 'info') {
+    const bgClass = {
+        'success': 'bg-success',
+        'error': 'bg-danger',
+        'warning': 'bg-warning',
+        'info': 'bg-info'
+    }[type] || 'bg-info';
+    
+    const toast = $(`
+        <div class="toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 320px;">
+            <div class="toast-header ${bgClass} text-white">
+                <strong class="mr-auto">${title}</strong>
+                <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>
+            </div>
+            <div class="toast-body bg-white">${message}</div>
+        </div>
+    `);
+    
+    $('body').append(toast);
+    toast.toast({delay: 4000}).toast('show');
+    toast.on('hidden.bs.toast', function() {
+        toast.remove();
+    });
+}
+
+// Listen for messages from iframe
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type) {
+        console.log('[LMS] Message from iframe:', event.data);
+        
+        switch (event.data.type) {
+            case 'slideChange':
+                onScormSlideChange(event.data.slideNumber);
+                break;
+            case 'complete':
+                onCourseCompleted();
+                break;
+        }
+    }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateProgressUI();
+    
+    // Expose SCORM API on parent window
+    window.API = createScormApi();
+    window.API_1484_11 = createScorm2004Api();
+    
+    // Slide dot click handlers (info only)
+    document.querySelectorAll('.slide-dot').forEach(dot => {
+        dot.addEventListener('click', function() {
+            const slideNum = parseInt(this.dataset.slide);
+            if (slideNum <= highestSlideReached) {
+                showToast('Slide ' + slideNum, 'This slide has been completed.', 'info');
+            } else {
+                showToast('🔒 Slide Locked', 'Complete previous slides first.', 'warning');
+            }
+        });
+    });
+});
+
+// Save progress before leaving
+window.addEventListener('beforeunload', function() {
+    if (courseLaunched) {
+        saveProgress();
+    }
+});
+
+// Clean up
+window.addEventListener('unload', function() {
+    if (timeTracker) clearInterval(timeTracker);
+    if (slideTimer) clearInterval(slideTimer);
+});
+</script>
+{% endblock %}
