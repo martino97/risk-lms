@@ -1071,14 +1071,12 @@ def update_interactive_progress(request, interactive_id):
         if total_slides > 0 and progress.highest_slide_reached >= total_slides:
             if not progress.content_completed:
                 progress.content_completed = True
-                from django.utils import timezone
                 progress.content_completed_at = timezone.now()
         
         # Also accept content_completed from frontend (fallback)
         if data.get('content_completed') == True and not progress.content_completed:
             if progress.highest_slide_reached >= total_slides:
                 progress.content_completed = True
-                from django.utils import timezone
                 progress.content_completed_at = timezone.now()
         
         progress.save()
