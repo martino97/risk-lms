@@ -170,7 +170,6 @@ class InteractiveCourseProgress(models.Model):
         if self.get_slides_completed_count() >= total_slides:
             self.content_completed = True
             if not self.content_completed_at:
-                from django.utils import timezone
                 self.content_completed_at = timezone.now()
 
 
