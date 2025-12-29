@@ -195,28 +195,70 @@
         backdrop-filter: blur(6px);
     }
 
-    .fullscreen-controls .btn {
-        white-space: nowrap;
-    }
+	    .fullscreen-controls .btn {
+	        white-space: nowrap;
+	    }
 
-    #playerContainer:fullscreen #courseIframe {
-        height: calc(100vh - 70px) !important;
-    }
+	    #playerContainer:fullscreen,
+	    #playerContainer:-webkit-full-screen,
+	    #playerContainer:-moz-full-screen,
+	    #playerContainer:-ms-fullscreen {
+	        width: 100vw;
+	        height: 100vh;
+	        background: #000;
+	    }
 
-    #playerContainer:fullscreen #slideNavSection {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1000;
-    }
+	    #playerContainer:fullscreen .course-iframe-container,
+	    #playerContainer:-webkit-full-screen .course-iframe-container,
+	    #playerContainer:-moz-full-screen .course-iframe-container,
+	    #playerContainer:-ms-fullscreen .course-iframe-container {
+	        position: absolute;
+	        top: 0;
+	        right: 0;
+	        bottom: 0;
+	        left: 0;
+	    }
 
-    #playerContainer:fullscreen #slideIndicator,
-    #playerContainer:fullscreen #fullscreenBtn {
-        z-index: 1001;
-    }
-</style>
-{% endblock %}
+	    #playerContainer:fullscreen #courseIframe,
+	    #playerContainer:-webkit-full-screen #courseIframe,
+	    #playerContainer:-moz-full-screen #courseIframe,
+	    #playerContainer:-ms-fullscreen #courseIframe {
+	        width: 100% !important;
+	        height: 100% !important;
+	        max-width: 100% !important;
+	        max-height: 100% !important;
+	        border: none !important;
+	        display: block;
+	    }
+
+	    #playerContainer:fullscreen #slideNavSection,
+	    #playerContainer:-webkit-full-screen #slideNavSection,
+	    #playerContainer:-moz-full-screen #slideNavSection,
+	    #playerContainer:-ms-fullscreen #slideNavSection {
+	        position: absolute;
+	        left: 0;
+	        right: 0;
+	        bottom: 0;
+	        z-index: 1000;
+	    }
+
+	    #playerContainer:fullscreen #slideIndicator,
+	    #playerContainer:fullscreen #fullscreenBtn,
+	    #playerContainer:-webkit-full-screen #slideIndicator,
+	    #playerContainer:-webkit-full-screen #fullscreenBtn,
+	    #playerContainer:-moz-full-screen #slideIndicator,
+	    #playerContainer:-moz-full-screen #fullscreenBtn,
+	    #playerContainer:-ms-fullscreen #slideIndicator,
+	    #playerContainer:-ms-fullscreen #fullscreenBtn {
+	        z-index: 1001;
+	    }
+
+	    #playerContainer:fullscreen::backdrop,
+	    #playerContainer:-webkit-full-screen::backdrop {
+	        background: #000;
+	    }
+	</style>
+	{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -332,12 +374,13 @@
                                 </span>
                             </div>
                             
-                            <!-- Fullscreen Button -->
-                            <button id="fullscreenBtn" onclick="toggleFullscreen()" 
-                                    style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; z-index: 100;">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                        </div>
+	                            <!-- Fullscreen Button -->
+	                            <button id="fullscreenBtn" type="button" onclick="toggleFullscreen()"
+	                                    title="Toggle fullscreen (F)"
+	                                    style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; z-index: 100;">
+	                                <i class="fas fa-expand"></i>
+	                            </button>
+	                        </div>
                         
                         <!-- Slide Navigation Controls -->
                         <div id="slideNavSection" class="py-3 px-4" style="background: #2d2d44;">
@@ -630,6 +673,13 @@ function exitFullScreen() {
     if (document.mozCancelFullScreen) return document.mozCancelFullScreen();
     if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
     if (document.msExitFullscreen) return document.msExitFullscreen();
+}
+
+function getFullscreenElement() {
+    return document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement;
 }
 
 // Start the course - show iframe and begin tracking
@@ -1362,15 +1412,15 @@ function pollCaptivateSlide() {
     }
 }
 
-// Toggle fullscreen
-function toggleFullscreen() {
-    const playerContainer = document.getElementById('playerContainer');
-    if (document.fullscreenElement) {
-        exitFullScreen();
-        return;
-    }
-    enterFullScreen(playerContainer);
-}
+	// Toggle fullscreen
+	function toggleFullscreen() {
+	    const playerContainer = document.getElementById('playerContainer');
+	    if (getFullscreenElement()) {
+	        exitFullScreen();
+	        return;
+	    }
+	    enterFullScreen(playerContainer);
+	}
 
 // Save suspend_data (Captivate's internal resume state)
 function saveSuspendData(suspendData) {
@@ -1568,10 +1618,36 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (e) {}
 });
 
-document.addEventListener('fullscreenchange', function() {
+function handleFullscreenChange() {
+    const isFullscreen = !!getFullscreenElement();
     const controls = document.getElementById('fullscreenControls');
-    if (!controls) return;
-    controls.style.display = document.fullscreenElement ? 'flex' : 'none';
+    if (controls) controls.style.display = isFullscreen ? 'flex' : 'none';
+
+    const fullscreenButton = document.getElementById('fullscreenBtn');
+    if (fullscreenButton) {
+        fullscreenButton.innerHTML = isFullscreen
+            ? '<i class="fas fa-compress"></i>'
+            : '<i class="fas fa-expand"></i>';
+    }
+}
+
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+document.addEventListener('keydown', function(event) {
+    if (!courseLaunched) return;
+    if (!event || !event.key) return;
+    if (event.key.toLowerCase() !== 'f') return;
+
+    const target = event.target;
+    if (target && typeof target.matches === 'function' && target.matches('input, textarea, select, [contenteditable="true"]')) {
+        return;
+    }
+
+    event.preventDefault();
+    toggleFullscreen();
 });
 
 // Save progress before leaving
