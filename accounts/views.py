@@ -15,6 +15,8 @@ def login_view(request):
     Users login with their sAMAccountName (e.g., JLugome, MMalopa)
     """
     if request.user.is_authenticated:
+        if not getattr(request.user, 'profile_completed', True):
+            return redirect('accounts:complete_profile')
         return redirect('courses:dashboard')
     
     if request.method == 'POST':
@@ -48,6 +50,9 @@ def login_view(request):
                 login(request, user)
                 logger.info(f"User logged in: {user.username} - {user.get_full_name()} (Role: {user.role})")
                 messages.success(request, f'Welcome, {user.get_full_name() or user.username}!')
+
+                if not getattr(user, 'profile_completed', True):
+                    return redirect('accounts:complete_profile')
                 
                 # Redirect based on role
                 if user.is_risk_admin():
@@ -65,6 +70,8 @@ def login_view(request):
 def register_view(request):
     """User registration view"""
     if request.user.is_authenticated:
+        if not getattr(request.user, 'profile_completed', True):
+            return redirect('accounts:complete_profile')
         return redirect('courses:dashboard')
     
     if request.method == 'POST':
@@ -73,7 +80,7 @@ def register_view(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Registration successful! Welcome to Risk LMS.')
-            return redirect('courses:dashboard')
+            return redirect('accounts:complete_profile')
     else:
         form = UserRegistrationForm()
     
@@ -90,3 +97,29 @@ def logout_view(request):
 def profile_view(request):
     """User profile view"""
     return render(request, 'accounts/profile.html', {'user': request.user})
+
+
+@login_required
+def complete_profile_view(request):
+    """First-time login onboarding - capture department and designation."""
+    if getattr(request.user, 'profile_completed', False):
+        return redirect('courses:dashboard')
+
+    if request.method == 'POST':
+        department = (request.POST.get('department') or '').strip()
+        designation = (request.POST.get('designation') or '').strip()
+
+        if department and designation:
+            request.user.department = department
+            request.user.designation = designation
+            request.user.profile_completed = True
+            request.user.save(update_fields=['department', 'designation', 'profile_completed', 'updated_at'])
+            messages.success(request, 'Welcome! Your profile has been completed.')
+            return redirect('courses:dashboard')
+
+        messages.error(request, 'Please select both department and designation.')
+
+    context = {
+        'designation_choices': User.DESIGNATION_CHOICES,
+    }
+    return render(request, 'accounts/complete_profile.html', context)

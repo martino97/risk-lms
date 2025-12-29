@@ -188,12 +188,14 @@ def upload_course(request):
         description = request.POST.get('description')
         passing_score = request.POST.get('passing_score', 80)
         is_published = request.POST.get('is_published') == 'on'
+        target_departments = request.POST.getlist('target_departments') or []
         
         course = Course.objects.create(
             title=title,
             description=description,
             passing_score=passing_score,
             is_published=is_published,
+            target_departments=target_departments,
             created_by=request.user
         )
         
@@ -204,7 +206,10 @@ def upload_course(request):
         messages.success(request, f'Course "{title}" created successfully!')
         return redirect('content:video_upload', course_id=course.id)
     
-    return render(request, 'content/upload_course.html')
+    context = {
+        'department_choices': Course.DEPARTMENT_CHOICES,
+    }
+    return render(request, 'content/upload_course.html', context)
 
 @login_required
 def video_upload(request, course_id):
@@ -1255,6 +1260,7 @@ def edit_course_settings(request, course_id):
             course.description = request.POST.get('description', course.description)
             course.passing_score = int(request.POST.get('passing_score', course.passing_score))
             course.is_published = request.POST.get('is_published') == 'on'
+            course.target_departments = request.POST.getlist('target_departments') or []
             
             # Update completion time settings
             course.completion_time_enabled = request.POST.get('completion_time_enabled') == 'on'
@@ -1288,6 +1294,7 @@ def edit_course_settings(request, course_id):
         'enrollments_count': course.enrollments.count(),
         'active_enrollments': course.enrollments.filter(is_completed=False).count(),
         'completed_enrollments': course.enrollments.filter(is_completed=True).count(),
+        'department_choices': Course.DEPARTMENT_CHOICES,
     }
     
     # Calculate completion rate

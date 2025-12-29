@@ -6,6 +6,8 @@ from .models import Course, Enrollment
 from videos.models import Video, VideoProgress, InteractiveCourse, InteractiveCourseProgress
 from quizzes.models import Question, QuizAttempt
 from certificates.models import Certificate
+from accounts.models import User
+import re
 
 @login_required
 def dashboard_view(request):
@@ -251,6 +253,86 @@ def enroll_course_view(request, course_id):
         messages.info(request, f'You are already enrolled in {course.title}.')
     
     return redirect('courses:course_detail', course_id=course.id)
+
+
+def _normalize_department_key(raw_value):
+    if not raw_value:
+        return ''
+    value = str(raw_value).strip().lower()
+
+    # Map known labels -> keys
+    label_to_key = {label.lower(): key for key, label in Course.DEPARTMENT_CHOICES}
+    if value in label_to_key:
+        return label_to_key[value]
+
+    # Common variants / free-text normalization
+    value = value.replace('&', 'and')
+    value = re.sub(r'[^a-z0-9]+', '_', value).strip('_')
+    if value in label_to_key:
+        return label_to_key[value]
+    if value in {k for k, _ in Course.DEPARTMENT_CHOICES}:
+        return value
+    if value in {'information_technology', 'informationtechnology'}:
+        return 'it'
+    if value in {'human_resources', 'humanresource'}:
+        return 'hr'
+
+    return value
+
+
+@login_required
+def bulk_enroll_department_view(request, course_id):
+    """Risk admin tool to bulk-enroll bankers by department."""
+    if not request.user.is_risk_admin():
+        messages.error(request, 'Unauthorized access.')
+        return redirect('courses:dashboard')
+
+    course = get_object_or_404(Course, id=course_id)
+
+    bankers = User.objects.filter(role='banker', is_active=True)
+
+    def matching_users(department_key):
+        if department_key == 'all':
+            return list(bankers)
+        matched = []
+        for user in bankers:
+            if _normalize_department_key(user.department) == department_key:
+                matched.append(user)
+        return matched
+
+    selected_department = request.POST.get('department') if request.method == 'POST' else ''
+    preview_department = selected_department or (course.target_departments[0] if course.target_departments else '')
+    preview_department = preview_department if preview_department in {k for k, _ in Course.DEPARTMENT_CHOICES} else ''
+    eligible_preview = matching_users(preview_department) if preview_department else []
+
+    if request.method == 'POST':
+        department_key = request.POST.get('department') or ''
+        valid_keys = {k for k, _ in Course.DEPARTMENT_CHOICES}
+        if department_key not in valid_keys:
+            messages.error(request, 'Please select a valid department.')
+            return redirect('courses:bulk_enroll', course_id=course.id)
+
+        eligible = matching_users(department_key)
+        created_count = 0
+        for user in eligible:
+            _, created = Enrollment.objects.get_or_create(user=user, course=course)
+            if created:
+                created_count += 1
+
+        messages.success(
+            request,
+            f'Bulk enrollment complete: {created_count} new enrollments created for "{course.title}".',
+        )
+        return redirect('courses:course_detail', course_id=course.id)
+
+    context = {
+        'course': course,
+        'department_choices': Course.DEPARTMENT_CHOICES,
+        'eligible_preview_count': len(eligible_preview),
+        'preview_department': preview_department,
+        'bankers_count': bankers.count(),
+    }
+    return render(request, 'courses/bulk_enroll.html', context)
 
 @login_required
 def my_courses_view(request):

@@ -11,11 +11,27 @@ class User(AbstractUser):
         ('risk_compliance_specialist', 'Risk & Compliance Specialist'),
         ('banker', 'Banker'),
     ]
+
+    DESIGNATION_CHOICES = [
+        ('teller', 'Teller'),
+        ('customer_service', 'Customer Service Officer'),
+        ('branch_manager', 'Branch Manager'),
+        ('loan_officer', 'Loan Officer'),
+        ('operations_officer', 'Operations Officer'),
+        ('it_officer', 'IT Officer'),
+        ('accountant', 'Accountant'),
+        ('auditor', 'Internal Auditor'),
+        ('compliance_officer', 'Compliance Officer'),
+        ('risk_analyst', 'Risk Analyst'),
+        ('other', 'Other'),
+    ]
     
     email = models.EmailField(_('email address'), unique=True)
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='banker')
     phone = models.CharField(max_length=20, blank=True)
     department = models.CharField(max_length=100, blank=True)
+    designation = models.CharField(max_length=50, choices=DESIGNATION_CHOICES, blank=True)
+    profile_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

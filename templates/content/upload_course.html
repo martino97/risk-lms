@@ -45,6 +45,32 @@
                             <small class="form-text text-muted">Provide a detailed overview of the course content and objectives</small>
                         </div>
 
+                        <div class="form-group">
+                            <label class="font-weight-bold mb-2">
+                                Target Departments
+                                <small class="text-muted font-weight-normal">(optional)</small>
+                            </label>
+                            <div class="border rounded p-3" style="background: #f8f9fc;">
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input" id="dept_all" name="target_departments" value="all">
+                                    <label class="custom-control-label" for="dept_all"><strong>All Departments</strong></label>
+                                </div>
+                                <div class="row">
+                                    {% for key, label in department_choices %}
+                                        {% if key != 'all' %}
+                                        <div class="col-md-6">
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input" id="dept_{{ key }}" name="target_departments" value="{{ key }}">
+                                                <label class="custom-control-label" for="dept_{{ key }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Select which departments this course is intended for (used for manager enrollment and filtering).</small>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -213,4 +239,25 @@
     border-left: 4px solid #4e73df;
 }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// If "All Departments" is selected, disable other department checkboxes.
+document.addEventListener('DOMContentLoaded', function() {
+    const all = document.getElementById('dept_all');
+    if (!all) return;
+
+    function sync() {
+        const others = document.querySelectorAll('input[name="target_departments"]:not(#dept_all)');
+        others.forEach(cb => {
+            cb.disabled = all.checked;
+            if (all.checked) cb.checked = false;
+        });
+    }
+
+    all.addEventListener('change', sync);
+    sync();
+});
+</script>
 {% endblock %}
