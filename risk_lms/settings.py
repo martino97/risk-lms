@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-temp-key-for-developm
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes') if not IS_PRODUCTION else False
 
 # Allowed hosts for the application
-ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', 'localhost, 127.0.0.1, cooplms.coopbank.co.tz')
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 # Add common development hosts if not in production
@@ -287,7 +287,7 @@ if IS_PRODUCTION:
         },
         'handlers': {
             'file': {
-                'level': 'ERROR',
+                'level': 'DEBUG',
                 'class': 'logging.FileHandler',
                 'filename': BASE_DIR / 'logs' / 'django_error.log',
                 'formatter': 'verbose',
