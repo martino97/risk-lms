@@ -388,7 +388,8 @@ def parse_captivate_metadata(extracted_path):
         'resolution_width': 1280,
         'resolution_height': 720,
         'entry_file': 'index.html',
-        'content_type': 'captivate'
+        'content_type': 'captivate',
+        'scale_mode': 'showAll'
     }
     
     # Look for CPM.js or similar config files
@@ -429,6 +430,10 @@ def parse_captivate_metadata(extracted_path):
                             metadata['resolution_width'] = int(width_match.group(1))
                         if height_match:
                             metadata['resolution_height'] = int(height_match.group(1))
+
+                        scale_match = re.search(r'scaleMode\s*[=:]\s*["\']([^"\']+)["\']', content)
+                        if scale_match:
+                            metadata['scale_mode'] = scale_match.group(1)
                             
                 except Exception as e:
                     print(f"Error parsing CPM.js: {e}")
@@ -465,6 +470,9 @@ def parse_captivate_metadata(extracted_path):
                                     metadata['resolution_width'] = int(meta['width'])
                                 if meta.get('height'):
                                     metadata['resolution_height'] = int(meta['height'])
+
+                                if meta.get('scaleMode'):
+                                    metadata['scale_mode'] = meta['scaleMode']
                                 
                                 # Entry file
                                 if meta.get('launchFile'):
@@ -489,6 +497,10 @@ def parse_captivate_metadata(extracted_path):
                                 duration_match = re.search(r'duration\s*[=:]\s*(\d+)', content)
                                 if duration_match:
                                     metadata['duration_minutes'] = int(duration_match.group(1))
+
+                            scale_match = re.search(r'scaleMode\s*[=:]\s*["\']([^"\']+)["\']', content)
+                            if scale_match:
+                                metadata['scale_mode'] = scale_match.group(1)
                                 
                 except Exception as e:
                     print(f"Error parsing project.txt: {e}")
@@ -508,6 +520,56 @@ def parse_captivate_metadata(extracted_path):
                     print(f"Error parsing index.html: {e}")
     
     return metadata
+
+
+def ensure_captivate_viewport(extract_path, entry_file):
+    index_path = os.path.join(extract_path, entry_file)
+    if not os.path.exists(index_path):
+        return
+
+    try:
+        with open(index_path, 'r', encoding='utf-8', errors='ignore') as f:
+            html_content = f.read()
+
+        if re.search(r'<meta\s+name=["\']viewport["\']', html_content, re.IGNORECASE):
+            return
+
+        viewport_tag = '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+        responsive_css = (
+            '<style>\n'
+            '    html, body {\n'
+            '        margin: 0 !important;\n'
+            '        padding: 0 !important;\n'
+            '        overflow: hidden !important;\n'
+            '        width: 100% !important;\n'
+            '        height: 100% !important;\n'
+            '    }\n'
+            '    #cpDocument, .cp-movie, [id^="Slide"] {\n'
+            '        transform-origin: top left !important;\n'
+            '    }\n'
+            '</style>'
+        )
+
+        head_match = re.search(r'<head[^>]*>', html_content, re.IGNORECASE)
+        if head_match:
+            insert_at = head_match.end()
+            html_content = (
+                html_content[:insert_at]
+                + '\n'
+                + viewport_tag
+                + '\n'
+                + responsive_css
+                + html_content[insert_at:]
+            )
+        elif '</head>' in html_content.lower():
+            html_content = html_content.replace('</head>', viewport_tag + '\n' + responsive_css + '\n</head>', 1)
+        else:
+            return
+
+        with open(index_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+    except Exception as e:
+        print(f"Error adding viewport tag to {index_path}: {e}")
 
 
 @login_required
@@ -675,6 +737,8 @@ def upload_interactive_course_new(request):
             if os.path.exists(os.path.join(extract_path, possible_entry)):
                 entry_file = possible_entry
                 break
+
+        ensure_captivate_viewport(extract_path, entry_file)
         
         # Safe integer conversion helper
         def safe_int_convert(value, default=0):
@@ -698,6 +762,7 @@ def upload_interactive_course_new(request):
             total_slides=safe_int_convert(metadata.get('total_slides')),
             resolution_width=safe_int_convert(metadata.get('resolution_width'), 1280),
             resolution_height=safe_int_convert(metadata.get('resolution_height'), 720),
+            scale_mode=metadata.get('scale_mode') or 'showAll',
             order_index=safe_int_convert(order_index),
             created_by=request.user
         )
@@ -781,6 +846,8 @@ def upload_interactive_course(request, course_id):
                 entry_file = 'index.html'
             elif os.path.exists(os.path.join(extract_path, 'index.htm')):
                 entry_file = 'index.htm'
+
+            ensure_captivate_viewport(extract_path, entry_file)
             
             # Reset package file pointer and save
             package_file.seek(0)
@@ -810,6 +877,7 @@ def upload_interactive_course(request, course_id):
                 total_slides=final_slides,
                 resolution_width=metadata['resolution_width'],
                 resolution_height=metadata['resolution_height'],
+                scale_mode=metadata.get('scale_mode') or 'showAll',
                 order_index=final_order,
                 created_by=request.user
             )

@@ -30,6 +30,7 @@ class InteractiveCourse(models.Model):
     total_slides = models.IntegerField(default=0)
     resolution_width = models.IntegerField(default=1280)
     resolution_height = models.IntegerField(default=720)
+    scale_mode = models.CharField(max_length=20, default='showAll', help_text='Captivate scale mode')
     
     # Thumbnail
     thumbnail = models.ImageField(upload_to='interactive_courses/thumbnails/', blank=True, null=True)

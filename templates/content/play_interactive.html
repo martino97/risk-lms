@@ -229,6 +229,7 @@
 	        max-height: 100% !important;
 	        border: none !important;
 	        display: block;
+	        transform-origin: center center;
 	    }
 
 	    #playerContainer:fullscreen #slideNavSection,
@@ -762,6 +763,97 @@ function getFullscreenElement() {
         document.msFullscreenElement;
 }
 
+function getCaptivateResolution() {
+    const width = {{ interactive_course.resolution_width|default:1280 }};
+    const height = {{ interactive_course.resolution_height|default:720 }};
+    return {
+        width: Math.max(1, parseInt(width, 10) || 1280),
+        height: Math.max(1, parseInt(height, 10) || 720)
+    };
+}
+
+function findCaptivateContainer(iframeDoc) {
+    if (!iframeDoc) return null;
+    return (
+        iframeDoc.getElementById('cpDocument') ||
+        iframeDoc.getElementById('Slide') ||
+        iframeDoc.querySelector('.cp-movie') ||
+        iframeDoc.querySelector('.slide') ||
+        iframeDoc.querySelector('[id^="Slide"]') ||
+        iframeDoc.body.firstElementChild ||
+        null
+    );
+}
+
+function scaleCaptivateToFullscreen(enable) {
+    const iframe = document.getElementById('courseIframe');
+    if (!iframe) return;
+
+    let iframeDoc = null;
+    try {
+        iframeDoc = iframe.contentWindow && iframe.contentWindow.document;
+    } catch (e) {
+        iframeDoc = null;
+    }
+
+    const resolution = getCaptivateResolution();
+    if (enable) {
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || resolution.width;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || resolution.height;
+        const scaleX = viewportWidth / resolution.width;
+        const scaleY = viewportHeight / resolution.height;
+        const scale = Math.min(scaleX, scaleY);
+
+        if (iframeDoc && iframeDoc.body) {
+            const container = findCaptivateContainer(iframeDoc);
+            const target = container || iframeDoc.body;
+            if (!target.dataset.lmsOriginalTransform) {
+                target.dataset.lmsOriginalTransform = target.style.transform || '';
+                target.dataset.lmsOriginalPosition = target.style.position || '';
+                target.dataset.lmsOriginalTop = target.style.top || '';
+                target.dataset.lmsOriginalLeft = target.style.left || '';
+                target.dataset.lmsOriginalMarginTop = target.style.marginTop || '';
+                target.dataset.lmsOriginalMarginLeft = target.style.marginLeft || '';
+            }
+
+            iframeDoc.body.style.overflow = 'hidden';
+            target.style.transform = 'scale(' + scale + ')';
+            target.style.transformOrigin = 'top left';
+            target.style.position = 'absolute';
+            target.style.top = '50%';
+            target.style.left = '50%';
+            target.style.marginTop = '-' + ((resolution.height * scale) / 2) + 'px';
+            target.style.marginLeft = '-' + ((resolution.width * scale) / 2) + 'px';
+        } else {
+            iframe.style.transform = 'scale(' + scale + ')';
+            iframe.style.transformOrigin = 'center center';
+        }
+    } else {
+        if (iframeDoc && iframeDoc.body) {
+            const container = findCaptivateContainer(iframeDoc);
+            const target = container || iframeDoc.body;
+            if (target && target.dataset.lmsOriginalTransform !== undefined) {
+                target.style.transform = target.dataset.lmsOriginalTransform;
+                target.style.position = target.dataset.lmsOriginalPosition;
+                target.style.top = target.dataset.lmsOriginalTop;
+                target.style.left = target.dataset.lmsOriginalLeft;
+                target.style.marginTop = target.dataset.lmsOriginalMarginTop;
+                target.style.marginLeft = target.dataset.lmsOriginalMarginLeft;
+            } else if (target) {
+                target.style.transform = '';
+                target.style.position = '';
+                target.style.top = '';
+                target.style.left = '';
+                target.style.marginTop = '';
+                target.style.marginLeft = '';
+            }
+            iframeDoc.body.style.overflow = '';
+        }
+        iframe.style.transform = '';
+        iframe.style.transformOrigin = '';
+    }
+}
+
 // Start the course - show iframe and begin tracking
 function startCourse() {
     courseLaunched = true;
@@ -788,6 +880,24 @@ function startCourse() {
     iframe.onload = function() {
         injectScormApiToIframe(iframe);
         setupCaptivateNavigationGuard(iframe);
+
+        try {
+            const scaleMode = '{{ interactive_course.scale_mode|default:"showAll"|escapejs }}';
+            const iframeWindow = iframe.contentWindow;
+            if (iframeWindow && iframeWindow.cp && iframeWindow.cp.model && iframeWindow.cp.model.data) {
+                iframeWindow.cp.model.data.scaleMode = scaleMode;
+            } else if (iframeWindow) {
+                iframeWindow.scaleMode = scaleMode;
+            }
+        } catch (e) {
+            // Ignore cross-origin access errors.
+        }
+
+        if (getFullscreenElement()) {
+            setTimeout(function() {
+                scaleCaptivateToFullscreen(true);
+            }, 200);
+        }
         
         // If resuming, navigate Captivate to the saved slide after a short delay
         // (Captivate needs time to initialize)
@@ -1696,12 +1806,26 @@ function handleFullscreenChange() {
             ? '<i class="fas fa-compress"></i>'
             : '<i class="fas fa-expand"></i>';
     }
+
+    if (isFullscreen) {
+        setTimeout(function() {
+            scaleCaptivateToFullscreen(true);
+        }, 250);
+    } else {
+        scaleCaptivateToFullscreen(false);
+    }
 }
 
 document.addEventListener('fullscreenchange', handleFullscreenChange);
 document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 document.addEventListener('mozfullscreenchange', handleFullscreenChange);
 document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+window.addEventListener('resize', function() {
+    if (getFullscreenElement()) {
+        scaleCaptivateToFullscreen(true);
+    }
+});
 
 document.addEventListener('keydown', function(event) {
     if (!courseLaunched) return;
