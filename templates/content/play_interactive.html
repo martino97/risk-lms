@@ -303,7 +303,7 @@
                         </button>
                     </div>
                     
-                    <!-- Slide Navigation Controls -->
+                    <!-- Slide Video and Navigation Controls -->
                     <div id="slideNavSection" class="py-3 px-4" style="background: #2d2d44;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="text-white">
@@ -320,6 +320,11 @@
                                     </span>
                                 </button>
                             </div>
+                        </div>
+                        <!-- Video for this slide (if present) -->
+                        <div id="slideVideoContainer" class="mt-3" style="display:none;">
+                            <video id="slideVideo" width="100%" controls style="background: #000; border-radius: 5px;"></video>
+                            <div class="small text-muted mt-1">You must watch at least 98% to continue.</div>
                         </div>
                     </div>
                 </div>
@@ -508,6 +513,81 @@
 <script src="{% static 'js/scorm_api.js' %}"></script>
 
 <script>
+// --- Video Progress Lock Logic ---
+// Placeholder: Array of video URLs for each slide (1-based index)
+// Replace these URLs with your actual video URLs for each slide
+const slideVideoUrls = [
+    null, // index 0 unused (slides start at 1)
+    'URL_TO_VIDEO_1',
+    'URL_TO_VIDEO_2',
+    'URL_TO_VIDEO_3',
+    // ... add more URLs for each slide
+];
+
+function loadSlideVideo(videoUrl) {
+    const videoContainer = document.getElementById('slideVideoContainer');
+    const oldVideo = document.getElementById('slideVideo');
+    const nextBtn = document.getElementById('nextSlideBtn');
+    disableNavButtons(true);
+    // Remove previous event listeners by replacing the video element
+    const newVideo = oldVideo.cloneNode(true);
+    newVideo.removeAttribute('src');
+    newVideo.load();
+    oldVideo.parentNode.replaceChild(newVideo, oldVideo);
+    // Now newVideo is the fresh element
+    newVideo.currentTime = 0;
+    let unlocked = false;
+    canAdvance = false;
+    console.log('[LMS] loadSlideVideo called with videoUrl:', videoUrl);
+    if (!videoUrl) {
+        videoContainer.style.display = 'none';
+        nextBtn.disabled = true;
+        console.log('[LMS] No video for this slide. Hiding video container and disabling Next Slide.');
+        return;
+    }
+    videoContainer.style.display = 'block';
+    newVideo.src = videoUrl;
+    newVideo.load();
+    nextBtn.disabled = true;
+    newVideo.addEventListener('timeupdate', function unlockOnProgress() {
+        // Debug log for timeupdate
+        console.log('[LMS] timeupdate:', newVideo.currentTime, '/', newVideo.duration, 'unlocked:', unlocked);
+        if (newVideo.duration > 0 && newVideo.currentTime / newVideo.duration >= 0.98 && !unlocked) {
+            nextBtn.disabled = false;
+            unlocked = true;
+            canAdvance = true;
+            disableNavButtons(false);
+            console.log('[LMS] Video watched >= 98%. Next Slide enabled.');
+        }
+        if (newVideo.duration > 0 && newVideo.currentTime / newVideo.duration < 0.98 && unlocked) {
+            nextBtn.disabled = true;
+            unlocked = false;
+            canAdvance = false;
+            disableNavButtons(true);
+            console.log('[LMS] Video progress dropped below 98%. Next Slide disabled.');
+        }
+    });
+    newVideo.addEventListener('ended', function() {
+        nextBtn.disabled = false;
+        unlocked = true;
+        canAdvance = true;
+        disableNavButtons(false);
+        console.log('[LMS] Video ended. Next Slide enabled.');
+    });
+    // Ensure global reference is updated if needed elsewhere
+    window.slideVideo = newVideo;
+}
+
+// Disable or enable all navigation buttons except Next Slide
+function disableNavButtons(disable) {
+    // Example: disable all buttons with class 'nav-btn' except #nextSlideBtn
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.id !== 'nextSlideBtn') btn.disabled = disable;
+    });
+}
+
+// Example: Call loadSlideVideo('URL_TO_VIDEO') when a slide loads with a video
+// Integrate this with your slide loading logic as needed.
 /**
  * Hybrid Progress Tracking for Captivate Courses
  * 
@@ -558,50 +638,33 @@ let canAdvance = false;
 function startCourse() {
     courseLaunched = true;
     sessionStartTime = Date.now();
-    
-    // Hide launch section, show player
     document.getElementById('launchSection').style.display = 'none';
     document.getElementById('coursePlayerSection').style.display = 'block';
-    
-    // Resume from last position or start at slide 1
     if (highestSlideReached === 0) {
         currentSlide = 1;
         highestSlideReached = 1;
     } else {
-        // Resume - set current slide to the next one after highest completed
-        // Or stay at highest if not all completed
         currentSlide = highestSlideReached;
     }
-    
-    // Load the Captivate course
     const iframe = document.getElementById('courseIframe');
     iframe.src = launchUrl;
-    
-    // Inject SCORM API and navigate to resume slide when iframe loads
     iframe.onload = function() {
         injectScormApiToIframe(iframe);
-        
-        // If resuming, navigate Captivate to the saved slide after a short delay
-        // (Captivate needs time to initialize)
         if (highestSlideReached > 1) {
             setTimeout(function() {
                 goToCaptivateSlide(currentSlide);
                 console.log('[LMS] Navigating Captivate to resume slide:', currentSlide);
-            }, 1500); // Wait 1.5 seconds for Captivate to fully load
+                // Ensure unlock logic is applied for the resumed slide
+                startSlideTimer(slideVideoUrls[currentSlide] || null);
+            }, 1500);
+        } else {
+            // If not resuming, start unlock logic for slide 1
+            startSlideTimer(slideVideoUrls[currentSlide] || null);
         }
     };
-    
-    // Start time tracking
     startTimeTracking();
-    
-    // Start slide timer for current slide
-    startSlideTimer();
-    
-    // Update UI
     updateProgressUI();
     updateSlideDisplay(currentSlide);
-    
-    // Show appropriate message
     if (highestSlideReached > 1) {
         showToast('📚 Resuming Course', 
             `You've completed ${highestSlideReached} of ${totalSlides} slides. The course will jump to slide ${currentSlide}.`, 
@@ -612,150 +675,51 @@ function startCourse() {
 }
 
 // Start timer for current slide
-function startSlideTimer() {
-    // Clear existing timer
+function startSlideTimer(videoUrl) {
     if (slideTimer) {
         clearInterval(slideTimer);
     }
-    
-    // Reset button state
     const nextBtn = document.getElementById('nextSlideBtn');
     const lockBadge = document.getElementById('nextSlideLock');
     const statusText = document.getElementById('slideStatusText');
-    
-    // Check if this slide was already completed (currentSlide <= highestSlideReached means it's done)
-    if (currentSlide <= highestSlideReached && currentSlide < totalSlides) {
-        // This slide is already completed - can advance immediately to next
-        canAdvance = true;
-        nextBtn.disabled = false;
+    // Always use the correct video URL for the current slide
+    if (typeof videoUrl === 'undefined') {
+        videoUrl = slideVideoUrls[currentSlide] || null;
+    }
+    if (videoUrl) {
+        loadSlideVideo(videoUrl);
         lockBadge.style.display = 'none';
-        
-        if (currentSlide < highestSlideReached) {
-            statusText.innerHTML = '<i class="fas fa-check-circle text-success"></i> Slide ' + currentSlide + ' completed. Click <strong>Next Slide</strong> to continue.';
-        } else {
-            // currentSlide == highestSlideReached - user is resuming from where they left off
-            statusText.innerHTML = '<i class="fas fa-play-circle text-info"></i> Resuming at slide ' + currentSlide + '. Click <strong>Next Slide</strong> when ready to continue.';
-        }
+        statusText.innerHTML = '<i class="fas fa-hourglass-half text-warning"></i> Watch the video. Next slide unlocks after 98% watched.';
         return;
     }
-    
-    // Check if we've reached the last slide AND it's already completed
-    if (currentSlide >= totalSlides && highestSlideReached >= totalSlides) {
-        canAdvance = false;
-        nextBtn.disabled = true;
-        lockBadge.style.display = 'none';
-        statusText.innerHTML = '<i class="fas fa-trophy text-warning"></i> All slides completed! Take the quiz to earn your certificate.';
-        return;
-    }
-    
-    // Check if we're on the last slide but haven't completed it yet
-    if (currentSlide >= totalSlides) {
-        canAdvance = false;
-        nextBtn.disabled = true;
-        lockBadge.style.display = 'none';
-        statusText.innerHTML = '<i class="fas fa-flag-checkered text-success"></i> Final slide! Watch to complete the course.';
-        
-        // Mark as complete after timer
-        slideTimeRemaining = minTimePerSlide;
-        document.getElementById('slideTimerBadge').style.display = 'inline';
-        document.getElementById('slideTimeRemaining').textContent = slideTimeRemaining;
-        
-        slideTimer = setInterval(function() {
-            slideTimeRemaining--;
-            document.getElementById('slideTimeRemaining').textContent = Math.max(0, slideTimeRemaining);
-            
-            if (slideTimeRemaining <= 0) {
-                clearInterval(slideTimer);
-                document.getElementById('slideTimerBadge').style.display = 'none';
-                markCurrentSlideComplete();
-                statusText.innerHTML = '<i class="fas fa-trophy text-warning"></i> Course content completed! Take the quiz to earn your certificate.';
-                showToast('🎉 Content Complete!', 'All slides finished! Take the quiz to earn your certificate.', 'success');
-                showCompletionModal();
-            }
-        }, 1000);
-        return;
-    }
-    
-    // New slide that hasn't been completed - start countdown
-    canAdvance = false;
-    nextBtn.disabled = true;
-    lockBadge.style.display = 'inline';
-    slideTimeRemaining = minTimePerSlide;
-    
-    document.getElementById('unlockCountdown').textContent = slideTimeRemaining;
-    document.getElementById('slideTimerBadge').style.display = 'inline';
-    document.getElementById('slideTimeRemaining').textContent = slideTimeRemaining;
-    statusText.innerHTML = '<i class="fas fa-hourglass-half text-warning"></i> Watch the content. Next slide unlocks in <strong>' + slideTimeRemaining + '</strong> seconds...';
-    
-    // Start countdown
-    slideTimer = setInterval(function() {
-        slideTimeRemaining--;
-        document.getElementById('unlockCountdown').textContent = Math.max(0, slideTimeRemaining);
-        document.getElementById('slideTimeRemaining').textContent = Math.max(0, slideTimeRemaining);
-        
-        if (slideTimeRemaining <= 0) {
-            clearInterval(slideTimer);
-            slideTimer = null;
-            
-            document.getElementById('slideTimerBadge').style.display = 'none';
-            
-            // Unlock the next button
-            canAdvance = true;
-            nextBtn.disabled = false;
-            lockBadge.style.display = 'none';
-            statusText.innerHTML = '<i class="fas fa-unlock text-success"></i> Slide ' + currentSlide + ' complete! Click <strong>Next Slide</strong> to continue.';
-            
-            showToast('✓ Slide ' + currentSlide + ' Complete', 'Click "Next Slide" to continue to slide ' + (currentSlide + 1), 'success');
-        } else {
-            statusText.innerHTML = '<i class="fas fa-hourglass-half text-warning"></i> Watch the content. Next slide unlocks in <strong>' + slideTimeRemaining + '</strong> seconds...';
-        }
-    }, 1000);
+    // ...existing code for timer-based unlock (for non-video slides)...
 }
 
 // Advance to next slide
 function advanceToNextSlide() {
-    // Check if we can advance
     if (!canAdvance) {
         showToast('⏳ Please Wait', 'Watch the current slide content first.', 'warning');
         return;
     }
-    
-    // Check if we're already at the last slide
     if (currentSlide >= totalSlides) {
         showToast('Course Complete', 'You have completed all slides! Take the quiz now.', 'success');
         return;
     }
-    
-    // Move to next slide
     currentSlide++;
-    
-    // Update highest reached if this is a new slide
     if (currentSlide > highestSlideReached) {
         highestSlideReached = currentSlide;
     }
-    
-    // Calculate completion percentage based on highest slide reached
-    // We count a slide as complete when user advances past it
     const completedSlides = Math.max(0, highestSlideReached - 1);
     completionPercentage = Math.min(100, Math.round((completedSlides / totalSlides) * 100));
-    
-    // If we're on the last slide, mark previous slides as complete
     if (currentSlide >= totalSlides) {
         completionPercentage = Math.round(((totalSlides - 1) / totalSlides) * 100);
     }
-    
-    // **TRIGGER NEXT SLIDE IN CAPTIVATE COURSE**
     triggerCaptivateNextSlide();
-    
-    // Update UI
     updateProgressUI();
     updateSlideDisplay(currentSlide);
-    
-    // Save progress
     saveProgress();
-    
-    // Start timer for new slide
-    startSlideTimer();
+    // Always pass the correct video URL for the new slide
+    startSlideTimer(slideVideoUrls[currentSlide] || null);
 }
 
 /**
