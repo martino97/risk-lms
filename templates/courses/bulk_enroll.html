@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Enroll - {{ course.title }}{% endblock %}
+
+{% block nav_courses %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-users-cog text-primary"></i> Bulk Enroll
+            </h1>
+            <p class="mb-0 text-gray-600">Enroll bankers by department into: <strong>{{ course.title }}</strong></p>
+        </div>
+        <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-filter"></i> Select Department
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="department" class="font-weight-bold">Department</label>
+                            <select id="department" name="department" class="form-control" required>
+                                <option value="">-- Select --</option>
+                                {% for key, label in department_choices %}
+                                <option value="{{ key }}" {% if preview_department == key %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">
+                                Matches are based on users’ stored department (captured on first login).
+                            </small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus mr-2"></i>Enroll Bankers
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-info-circle"></i> Preview
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Total active bankers:</strong> {{ bankers_count }}
+                    </p>
+                    {% if preview_department %}
+                    <p class="mb-0">
+                        <strong>Eligible in selected department:</strong> {{ eligible_preview_count }}
+                    </p>
+                    {% else %}
+                    <p class="mb-0 text-muted">
+                        Select a department to preview how many bankers will be enrolled.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Bulk enrollment creates enrollments only if they don’t already exist.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -5,12 +5,28 @@ from datetime import timedelta
 
 class Course(models.Model):
     """Course model"""
+    DEPARTMENT_CHOICES = [
+        ('all', 'All Departments'),
+        ('operations', 'Operations'),
+        ('retail_banking', 'Retail Banking'),
+        ('corporate_banking', 'Corporate Banking'),
+        ('risk_management', 'Risk Management'),
+        ('compliance', 'Compliance'),
+        ('finance', 'Finance'),
+        ('it', 'Information Technology'),
+        ('hr', 'Human Resources'),
+        ('audit', 'Internal Audit'),
+        ('marketing', 'Marketing'),
+        ('branch_network', 'Branch Network'),
+    ]
+
     title = models.CharField(max_length=255)
     description = models.TextField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_courses')
     is_published = models.BooleanField(default=False)
     passing_score = models.IntegerField(default=80)
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
+    target_departments = models.JSONField(default=list, blank=True, help_text='List of department keys that should be enrolled/targeted')
     
     # Course completion time limits
     completion_time_enabled = models.BooleanField(
@@ -31,6 +47,10 @@ class Course(models.Model):
     
     def __str__(self):
         return self.title
+
+    def targets_department(self, department_key):
+        targets = self.target_departments or []
+        return 'all' in targets or (department_key in targets)
     
     def get_total_videos(self):
         return self.videos.count()

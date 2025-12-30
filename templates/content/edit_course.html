@@ -65,6 +65,36 @@
 
                         <hr>
 
+                        <!-- Target Departments -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-sitemap"></i> Target Departments
+                        </h5>
+                        <div class="form-group">
+                            <div class="border rounded p-3" style="background: #f8f9fc;">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="dept_all" name="target_departments" value="all"
+                                           {% if 'all' in course.target_departments %}checked{% endif %}>
+                                    <label class="form-check-label" for="dept_all"><strong>All Departments</strong></label>
+                                </div>
+                                <div class="row">
+                                    {% for key, label in department_choices %}
+                                        {% if key != 'all' %}
+                                        <div class="col-md-6">
+                                            <div class="form-check mb-2">
+                                                <input type="checkbox" class="form-check-input" id="dept_{{ key }}" name="target_departments" value="{{ key }}"
+                                                       {% if key in course.target_departments %}checked{% endif %}>
+                                                <label class="form-check-label" for="dept_{{ key }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Used for department-based enrollment and visibility.</small>
+                        </div>
+
+                        <hr>
+
                         <!-- Course Completion Time Limits -->
                         <h5 class="text-primary mb-3">
                             <i class="fas fa-clock"></i> Course Completion Time Limits
@@ -223,6 +253,22 @@
 </div>
 
 <script>
+// If "All Departments" is selected, disable other department checkboxes.
+try {
+    const all = document.getElementById('dept_all');
+    if (all) {
+        const syncDept = function() {
+            const others = document.querySelectorAll('input[name="target_departments"]:not(#dept_all)');
+            others.forEach(cb => {
+                cb.disabled = all.checked;
+                if (all.checked) cb.checked = false;
+            });
+        };
+        all.addEventListener('change', syncDept);
+        syncDept();
+    }
+} catch (e) {}
+
 // Toggle time limit settings
 document.getElementById('completion_time_enabled').addEventListener('change', function() {
     const timeLimitSettings = document.getElementById('time_limit_settings');
