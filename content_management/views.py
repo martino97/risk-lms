@@ -1306,63 +1306,115 @@ def edit_course_settings(request, course_id):
 
 @login_required
 def download_course_enrollment_report(request):
+    # ...existing code...
+    # ==========================================
+    # Sheet 6: Enrolled Individuals by Course
+    # ==========================================
+    ws_enrolled = wb.create_sheet("Enrolled Individuals")
+    enrolled_headers = ["#", "Course Title", "Full Name", "Email"]
+    for col, header in enumerate(enrolled_headers, 1):
+        cell = ws_enrolled.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_alignment
+
+    row = 2
+    idx = 1
+    for course in Course.objects.all().order_by('title'):
+        enrollments = course.enrollments.select_related('user').all()
+        for enrollment in enrollments:
+            user = enrollment.user
+            ws_enrolled.cell(row=row, column=1, value=idx)
+            ws_enrolled.cell(row=row, column=2, value=course.title)
+            ws_enrolled.cell(row=row, column=3, value=user.get_full_name() if hasattr(user, 'get_full_name') else user.username)
+            ws_enrolled.cell(row=row, column=4, value=user.email)
+            row += 1
+            idx += 1
+        # ==========================================
+        # Sheet 6: Enrolled Individuals by Course
+        # ==========================================
+        ws_enrolled = wb.create_sheet("Enrolled Individuals")
+        enrolled_headers = ["#", "Course Title", "Full Name", "Email"]
+        for col, header in enumerate(enrolled_headers, 1):
+            cell = ws_enrolled.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+
+        row = 2
+        idx = 1
+        for course in Course.objects.all().order_by('title'):
+            enrollments = course.enrollments.select_related('user').all()
+            for enrollment in enrollments:
+                user = enrollment.user
+                ws_enrolled.cell(row=row, column=1, value=idx)
+                ws_enrolled.cell(row=row, column=2, value=course.title)
+                ws_enrolled.cell(row=row, column=3, value=user.get_full_name() if hasattr(user, 'get_full_name') else user.username)
+                ws_enrolled.cell(row=row, column=4, value=user.email)
+                row += 1
+                idx += 1
+
+
+# Top-level function definition for download_course_enrollment_report
+@login_required
+def download_course_enrollment_report(request):
     """Download Excel report of course enrollments and completion statistics"""
     if not request.user.is_risk_admin():
         messages.error(request, 'Unauthorized access.')
         return redirect('content:dashboard')
-    
+
     from videos.models import InteractiveCourse, InteractiveCourseProgress
     from certificates.models import Certificate
-    
+
     # Create workbook
     wb = Workbook()
-    
+
     # Header styling
     header_font = Font(bold=True, color="FFFFFF")
     header_fill = PatternFill(start_color="002B5C", end_color="002B5C", fill_type="solid")
     header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    
+
     # Success styling (green)
     success_fill = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
     success_font = Font(color="006100")
-    
+
     # Warning styling (yellow)
     warning_fill = PatternFill(start_color="FFEB9C", end_color="FFEB9C", fill_type="solid")
     warning_font = Font(color="9C5700")
-    
+
     # Danger styling (red)
     danger_fill = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")
     danger_font = Font(color="9C0006")
-    
+
     # Info styling (blue)
     info_fill = PatternFill(start_color="BDD7EE", end_color="BDD7EE", fill_type="solid")
     info_font = Font(color="1F4E79")
-    
+
     # ==========================================
     # Sheet 1: Summary Statistics
     # ==========================================
     ws_summary = wb.active
     ws_summary.title = "Summary"
-    
+
     # Get all bankers
     all_bankers = User.objects.filter(role='banker')
     total_bankers = all_bankers.count()
-    
+
     # Get interactive courses
     interactive_courses = InteractiveCourse.objects.filter(is_active=True)
-    
+
     # Calculate statistics
     total_logged_in = all_bankers.filter(last_login__isnull=False).count()
     never_logged_in = total_bankers - total_logged_in
     total_certificates = Certificate.objects.filter(is_valid=True).count()
-    
+
     # Summary headers
     ws_summary.cell(row=1, column=1, value="COURSE ENROLLMENT & COMPLETION REPORT").font = Font(bold=True, size=16)
     ws_summary.cell(row=2, column=1, value=f"Generated: {datetime.now().strftime('%d %B %Y %H:%M')}").font = Font(italic=True)
     ws_summary.cell(row=3, column=1, value="Co-operative Bank of Tanzania PLC - Risk Department LMS").font = Font(italic=True)
-    
+
     ws_summary.cell(row=5, column=1, value="OVERALL STATISTICS").font = Font(bold=True, size=12)
-    
+
     stats = [
         ("Total Staff (AD Users)", total_bankers),
         ("Staff Who Have Logged In", total_logged_in),
@@ -1370,23 +1422,23 @@ def download_course_enrollment_report(request):
         ("Total Certificates Issued", total_certificates),
         ("Compliance Rate", f"{round((total_certificates / total_bankers * 100) if total_bankers > 0 else 0, 1)}%"),
     ]
-    
+
     for i, (label, value) in enumerate(stats, 6):
         ws_summary.cell(row=i, column=1, value=label).font = Font(bold=True)
         ws_summary.cell(row=i, column=2, value=value)
-    
+
     # Per-course statistics
     row = len(stats) + 8
     ws_summary.cell(row=row, column=1, value="PER-COURSE STATISTICS").font = Font(bold=True, size=12)
     row += 1
-    
+
     course_headers = ["Course Name", "Total Staff", "Enrolled", "Not Started", "In Progress", "Completed Content", "Certified", "Completion Rate"]
     for col, header in enumerate(course_headers, 1):
         cell = ws_summary.cell(row=row, column=col, value=header)
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = header_alignment
-    
+
     row += 1
     for ic in interactive_courses:
         enrolled = InteractiveCourseProgress.objects.filter(interactive_course=ic).count()
@@ -1405,12 +1457,12 @@ def download_course_enrollment_report(request):
         ws_summary.cell(row=row, column=7, value=certified)
         ws_summary.cell(row=row, column=8, value=f"{completion_rate}%")
         row += 1
-    
+
     # ==========================================
     # Sheet 2: Detailed Staff Progress (AD Users)
     # ==========================================
     ws_staff = wb.create_sheet("Staff Progress (AD)")
-    
+
     # Build headers dynamically based on courses
     staff_headers = ["#", "Full Name", "Email (AD Account)", "Last Login", "Login Status"]
     for ic in interactive_courses:
@@ -1418,13 +1470,13 @@ def download_course_enrollment_report(request):
         staff_headers.append(f"{ic.title[:30]} - Progress %")
         staff_headers.append(f"{ic.title[:30]} - Started")
         staff_headers.append(f"{ic.title[:30]} - Certificate")
-    
+
     for col, header in enumerate(staff_headers, 1):
         cell = ws_staff.cell(row=1, column=col, value=header)
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = header_alignment
-    
+
     # Add staff data
     row = 2
     for idx, banker in enumerate(all_bankers.order_by('first_name', 'last_name'), 1):
@@ -1505,19 +1557,19 @@ def download_course_enrollment_report(request):
             col += 1
         
         row += 1
-    
+
     # ==========================================
     # Sheet 3: Not Enrolled Staff
     # ==========================================
     ws_not_enrolled = wb.create_sheet("Not Started")
-    
+
     not_enrolled_headers = ["#", "Full Name", "Email (AD Account)", "Last Login", "Login Status", "Action Required"]
     for col, header in enumerate(not_enrolled_headers, 1):
         cell = ws_not_enrolled.cell(row=1, column=col, value=header)
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = header_alignment
-    
+
     row = 2
     idx = 1
     for banker in all_bankers.order_by('first_name', 'last_name'):
@@ -1542,21 +1594,21 @@ def download_course_enrollment_report(request):
             
             row += 1
             idx += 1
-    
+
     # ==========================================
     # Sheet 4: Certified Staff
     # ==========================================
     ws_certified = wb.create_sheet("Certified Staff")
-    
+
     certified_headers = ["#", "Full Name", "Email", "Course", "Certificate Number", "Issue Date", "Score"]
     for col, header in enumerate(certified_headers, 1):
         cell = ws_certified.cell(row=1, column=col, value=header)
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = header_alignment
-    
+
     certificates = Certificate.objects.filter(is_valid=True).select_related('user', 'interactive_course').order_by('-issue_date')
-    
+
     for row, cert in enumerate(certificates, 2):
         ws_certified.cell(row=row, column=1, value=row-1)
         ws_certified.cell(row=row, column=2, value=cert.user.get_full_name())
@@ -1565,12 +1617,12 @@ def download_course_enrollment_report(request):
         ws_certified.cell(row=row, column=5, value=cert.certificate_number)
         ws_certified.cell(row=row, column=6, value=cert.issue_date.strftime('%d %b %Y') if cert.issue_date else "N/A")
         ws_certified.cell(row=row, column=7, value=f"{cert.overall_score}%" if cert.overall_score else "N/A")
-    
+
     # ==========================================
     # Sheet 5: Legacy Course Overview (Original)
     # ==========================================
     ws_overview = wb.create_sheet("Course Overview")
-    
+
     overview_headers = [
         "Course ID", "Course Title", "Created By", "Created Date", 
         "Total Enrollments", "Completed", "In Progress", "Completion Rate (%)",
@@ -1663,51 +1715,68 @@ def download_user_performance_report(request):
         cell.fill = header_fill
         cell.alignment = header_alignment
     
-    # Get all quiz attempts with user and course data
+    # Get all completed quiz attempts (regular and interactive courses)
     attempts_data = []
     users = User.objects.filter(role='banker')
-    
+
     for user in users:
-        courses = Course.objects.filter(enrollments__user=user)
-        for course in courses:
-            user_attempts = QuizAttempt.objects.filter(
-                user=user, course=course, completed_at__isnull=False
-            ).order_by('-completed_at')
-            
-            if user_attempts.exists():
-                best_score = user_attempts.order_by('-score').first().score
-                latest_score = user_attempts.first().score
-                avg_score = user_attempts.aggregate(Avg('score'))['score__avg']
-                
-                # Get answer statistics
-                user_answers = QuizAnswer.objects.filter(
-                    attempt__user=user, attempt__course=course
-                )
-                total_answers = user_answers.count()
-                correct_answers = user_answers.filter(is_correct=True).count()
-                wrong_answers = total_answers - correct_answers
-                accuracy = (correct_answers / total_answers * 100) if total_answers > 0 else 0
-                
-                attempts_data.append({
-                    'user': user,
-                    'course': course,
-                    'attempts_count': user_attempts.count(),
-                    'best_score': best_score,
-                    'latest_score': latest_score,
-                    'avg_score': avg_score,
-                    'total_answers': total_answers,
-                    'correct_answers': correct_answers,
-                    'wrong_answers': wrong_answers,
-                    'accuracy': accuracy,
-                    'last_attempt': user_attempts.first().completed_at
-                })
+        # All completed quiz attempts for this user (regular and interactive)
+        user_attempts = QuizAttempt.objects.filter(
+            user=user,
+            completed_at__isnull=False
+        ).order_by('-completed_at')
+
+        # Group attempts by course or interactive_course
+        course_attempts = {}
+        for attempt in user_attempts:
+            # Use course or interactive_course as key
+            course_key = attempt.course if attempt.course else attempt.interactive_course
+            if not course_key:
+                continue
+            if course_key not in course_attempts:
+                course_attempts[course_key] = []
+            course_attempts[course_key].append(attempt)
+
+        for course_key, attempts in course_attempts.items():
+            best_score = max(a.score for a in attempts if a.score is not None)
+            latest_score = attempts[0].score if attempts[0].score is not None else 0
+            avg_score = sum(a.score for a in attempts if a.score is not None) / len([a for a in attempts if a.score is not None])
+
+            # Get answer statistics for this course/interactive_course
+            user_answers = QuizAnswer.objects.filter(
+                attempt__in=attempts
+            )
+            total_answers = user_answers.count()
+            correct_answers = user_answers.filter(is_correct=True).count()
+            wrong_answers = total_answers - correct_answers
+            accuracy = (correct_answers / total_answers * 100) if total_answers > 0 else 0
+
+            # Get course/inter_course title
+            if hasattr(course_key, 'title'):
+                course_title = course_key.title
+            else:
+                course_title = str(course_key)
+
+            attempts_data.append({
+                'user': user,
+                'course': course_title,
+                'attempts_count': len(attempts),
+                'best_score': best_score,
+                'latest_score': latest_score,
+                'avg_score': avg_score,
+                'total_answers': total_answers,
+                'correct_answers': correct_answers,
+                'wrong_answers': wrong_answers,
+                'accuracy': accuracy,
+                'last_attempt': attempts[0].completed_at
+            })
     
     # Populate overview sheet
     for row, data in enumerate(attempts_data, 2):
         ws_overview.cell(row=row, column=1, value=data['user'].id)
         ws_overview.cell(row=row, column=2, value=data['user'].get_full_name())
         ws_overview.cell(row=row, column=3, value=data['user'].email)
-        ws_overview.cell(row=row, column=4, value=data['course'].title)
+        ws_overview.cell(row=row, column=4, value=data['course'])
         ws_overview.cell(row=row, column=5, value=data['attempts_count'])
         ws_overview.cell(row=row, column=6, value=round(data['best_score'], 1))
         ws_overview.cell(row=row, column=7, value=round(data['latest_score'], 1))
@@ -1752,7 +1821,7 @@ def download_user_performance_report(request):
         
         ws_details.cell(row=row, column=1, value=attempt.user.get_full_name())
         ws_details.cell(row=row, column=2, value=attempt.user.email)
-        ws_details.cell(row=row, column=3, value=attempt.course.title)
+        ws_details.cell(row=row, column=3, value=attempt.course.title if attempt.course else "N/A")
         ws_details.cell(row=row, column=4, value=question.question_text[:100] + "..." if len(question.question_text) > 100 else question.question_text)
         ws_details.cell(row=row, column=5, value=correct_text)
         ws_details.cell(row=row, column=6, value=user_answer_text)

@@ -1,0 +1,1585 @@
+[
+  {
+    "model": "admin.logentry",
+    "pk": 15,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373739+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "6",
+      "object_repr": "CYBER SECURITY",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 14,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373722+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "5",
+      "object_repr": "Enterprise Risk Management (ERM) in Financial Institutions",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 13,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373704+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "8",
+      "object_repr": "Martin Malopa",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 12,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373685+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "7",
+      "object_repr": "Risk Analysis",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373665+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "2",
+      "object_repr": "Risk And Compliance Fundamentals",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373640+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "3",
+      "object_repr": "🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+      "action_time": "2025-12-10 09:44:49.373584+00:00",
+      "user": 10,
+      "content_type": 7,
+      "object_id": "4",
+      "object_repr": "🧭Enterprise Risk Management (ERM) in Financial Institutions",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+      "action_time": "2025-11-13 07:15:49.353624+00:00",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "3",
+      "object_repr": "Julleth Mselle (Julleth.Mselle@cbtbank.co.tz)",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"password\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 7,
+    "fields": {
+      "action_time": "2025-11-13 07:04:47.134100+00:00",
+      "user": 2,
+      "content_type": 9,
+      "object_id": "6",
+      "object_repr": "🏦 Risk Management in Banking Systems – Detailed Description - 🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Duration\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 6,
+    "fields": {
+      "action_time": "2025-11-13 07:04:18.276003+00:00",
+      "user": 2,
+      "content_type": 11,
+      "object_id": "6",
+      "object_repr": "Martin Malopa - 🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Is completed\", \"Completed at\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 5,
+    "fields": {
+      "action_time": "2025-11-13 06:47:05.183741+00:00",
+      "user": 2,
+      "content_type": 7,
+      "object_id": "3",
+      "object_repr": "🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 4,
+    "fields": {
+      "action_time": "2025-11-13 06:44:26.001159+00:00",
+      "user": 2,
+      "content_type": 9,
+      "object_id": "6",
+      "object_repr": "🏦 Risk Management in Banking Systems – Detailed Description - 🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Duration\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 3,
+    "fields": {
+      "action_time": "2025-11-13 06:44:01.247087+00:00",
+      "user": 2,
+      "content_type": 9,
+      "object_id": "6",
+      "object_repr": "🏦 Risk Management in Banking Systems – Detailed Description - 🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Duration\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 2,
+    "fields": {
+      "action_time": "2025-11-13 06:42:21.512597+00:00",
+      "user": 2,
+      "content_type": 9,
+      "object_id": "6",
+      "object_repr": "🏦 Risk Management in Banking Systems – Detailed Description - 🏦 Risk Management in Banking Systems – Detailed Description",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Duration\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1,
+    "fields": {
+      "action_time": "2025-11-07 17:54:53.114767+00:00",
+      "user": 2,
+      "content_type": 7,
+      "object_id": "1",
+      "object_repr": "Know The Money Roundly",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 21,
+    "fields": {
+      "name": "Can add User",
+      "content_type": 6,
+      "codename": "add_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 22,
+    "fields": {
+      "name": "Can change User",
+      "content_type": 6,
+      "codename": "change_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 23,
+    "fields": {
+      "name": "Can delete User",
+      "content_type": 6,
+      "codename": "delete_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 24,
+    "fields": {
+      "name": "Can view User",
+      "content_type": 6,
+      "codename": "view_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 1,
+    "fields": {
+      "name": "Can add log entry",
+      "content_type": 1,
+      "codename": "add_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 2,
+    "fields": {
+      "name": "Can change log entry",
+      "content_type": 1,
+      "codename": "change_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 3,
+    "fields": {
+      "name": "Can delete log entry",
+      "content_type": 1,
+      "codename": "delete_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 4,
+    "fields": {
+      "name": "Can view log entry",
+      "content_type": 1,
+      "codename": "view_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 9,
+    "fields": {
+      "name": "Can add group",
+      "content_type": 3,
+      "codename": "add_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 10,
+    "fields": {
+      "name": "Can change group",
+      "content_type": 3,
+      "codename": "change_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 11,
+    "fields": {
+      "name": "Can delete group",
+      "content_type": 3,
+      "codename": "delete_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 12,
+    "fields": {
+      "name": "Can view group",
+      "content_type": 3,
+      "codename": "view_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 5,
+    "fields": {
+      "name": "Can add permission",
+      "content_type": 2,
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 6,
+    "fields": {
+      "name": "Can change permission",
+      "content_type": 2,
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 7,
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": 2,
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 8,
+    "fields": {
+      "name": "Can view permission",
+      "content_type": 2,
+      "codename": "view_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 61,
+    "fields": {
+      "name": "Can add certificate",
+      "content_type": 16,
+      "codename": "add_certificate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 62,
+    "fields": {
+      "name": "Can change certificate",
+      "content_type": 16,
+      "codename": "change_certificate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 63,
+    "fields": {
+      "name": "Can delete certificate",
+      "content_type": 16,
+      "codename": "delete_certificate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 64,
+    "fields": {
+      "name": "Can view certificate",
+      "content_type": 16,
+      "codename": "view_certificate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 13,
+    "fields": {
+      "name": "Can add content type",
+      "content_type": 4,
+      "codename": "add_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 14,
+    "fields": {
+      "name": "Can change content type",
+      "content_type": 4,
+      "codename": "change_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 15,
+    "fields": {
+      "name": "Can delete content type",
+      "content_type": 4,
+      "codename": "delete_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 16,
+    "fields": {
+      "name": "Can view content type",
+      "content_type": 4,
+      "codename": "view_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 25,
+    "fields": {
+      "name": "Can add course",
+      "content_type": 7,
+      "codename": "add_course"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 26,
+    "fields": {
+      "name": "Can change course",
+      "content_type": 7,
+      "codename": "change_course"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 27,
+    "fields": {
+      "name": "Can delete course",
+      "content_type": 7,
+      "codename": "delete_course"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 28,
+    "fields": {
+      "name": "Can view course",
+      "content_type": 7,
+      "codename": "view_course"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 29,
+    "fields": {
+      "name": "Can add enrollment",
+      "content_type": 8,
+      "codename": "add_enrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 30,
+    "fields": {
+      "name": "Can change enrollment",
+      "content_type": 8,
+      "codename": "change_enrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 31,
+    "fields": {
+      "name": "Can delete enrollment",
+      "content_type": 8,
+      "codename": "delete_enrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 32,
+    "fields": {
+      "name": "Can view enrollment",
+      "content_type": 8,
+      "codename": "view_enrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 45,
+    "fields": {
+      "name": "Can add question",
+      "content_type": 12,
+      "codename": "add_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 46,
+    "fields": {
+      "name": "Can change question",
+      "content_type": 12,
+      "codename": "change_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 47,
+    "fields": {
+      "name": "Can delete question",
+      "content_type": 12,
+      "codename": "delete_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 48,
+    "fields": {
+      "name": "Can view question",
+      "content_type": 12,
+      "codename": "view_question"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 49,
+    "fields": {
+      "name": "Can add question option",
+      "content_type": 13,
+      "codename": "add_questionoption"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 50,
+    "fields": {
+      "name": "Can change question option",
+      "content_type": 13,
+      "codename": "change_questionoption"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 51,
+    "fields": {
+      "name": "Can delete question option",
+      "content_type": 13,
+      "codename": "delete_questionoption"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 52,
+    "fields": {
+      "name": "Can view question option",
+      "content_type": 13,
+      "codename": "view_questionoption"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 57,
+    "fields": {
+      "name": "Can add quiz answer",
+      "content_type": 15,
+      "codename": "add_quizanswer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 58,
+    "fields": {
+      "name": "Can change quiz answer",
+      "content_type": 15,
+      "codename": "change_quizanswer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 59,
+    "fields": {
+      "name": "Can delete quiz answer",
+      "content_type": 15,
+      "codename": "delete_quizanswer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 60,
+    "fields": {
+      "name": "Can view quiz answer",
+      "content_type": 15,
+      "codename": "view_quizanswer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 53,
+    "fields": {
+      "name": "Can add quiz attempt",
+      "content_type": 14,
+      "codename": "add_quizattempt"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 54,
+    "fields": {
+      "name": "Can change quiz attempt",
+      "content_type": 14,
+      "codename": "change_quizattempt"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 55,
+    "fields": {
+      "name": "Can delete quiz attempt",
+      "content_type": 14,
+      "codename": "delete_quizattempt"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 56,
+    "fields": {
+      "name": "Can view quiz attempt",
+      "content_type": 14,
+      "codename": "view_quizattempt"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 17,
+    "fields": {
+      "name": "Can add session",
+      "content_type": 5,
+      "codename": "add_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 18,
+    "fields": {
+      "name": "Can change session",
+      "content_type": 5,
+      "codename": "change_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 19,
+    "fields": {
+      "name": "Can delete session",
+      "content_type": 5,
+      "codename": "delete_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 20,
+    "fields": {
+      "name": "Can view session",
+      "content_type": 5,
+      "codename": "view_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 69,
+    "fields": {
+      "name": "Can add interactive course",
+      "content_type": 18,
+      "codename": "add_interactivecourse"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 70,
+    "fields": {
+      "name": "Can change interactive course",
+      "content_type": 18,
+      "codename": "change_interactivecourse"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 71,
+    "fields": {
+      "name": "Can delete interactive course",
+      "content_type": 18,
+      "codename": "delete_interactivecourse"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 72,
+    "fields": {
+      "name": "Can view interactive course",
+      "content_type": 18,
+      "codename": "view_interactivecourse"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 65,
+    "fields": {
+      "name": "Can add interactive course progress",
+      "content_type": 17,
+      "codename": "add_interactivecourseprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 66,
+    "fields": {
+      "name": "Can change interactive course progress",
+      "content_type": 17,
+      "codename": "change_interactivecourseprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 67,
+    "fields": {
+      "name": "Can delete interactive course progress",
+      "content_type": 17,
+      "codename": "delete_interactivecourseprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 68,
+    "fields": {
+      "name": "Can view interactive course progress",
+      "content_type": 17,
+      "codename": "view_interactivecourseprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 33,
+    "fields": {
+      "name": "Can add video",
+      "content_type": 9,
+      "codename": "add_video"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 34,
+    "fields": {
+      "name": "Can change video",
+      "content_type": 9,
+      "codename": "change_video"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 35,
+    "fields": {
+      "name": "Can delete video",
+      "content_type": 9,
+      "codename": "delete_video"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 36,
+    "fields": {
+      "name": "Can view video",
+      "content_type": 9,
+      "codename": "view_video"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 41,
+    "fields": {
+      "name": "Can add video progress",
+      "content_type": 11,
+      "codename": "add_videoprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 42,
+    "fields": {
+      "name": "Can change video progress",
+      "content_type": 11,
+      "codename": "change_videoprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 43,
+    "fields": {
+      "name": "Can delete video progress",
+      "content_type": 11,
+      "codename": "delete_videoprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 44,
+    "fields": {
+      "name": "Can view video progress",
+      "content_type": 11,
+      "codename": "view_videoprogress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 37,
+    "fields": {
+      "name": "Can add video subtitle",
+      "content_type": 10,
+      "codename": "add_videosubtitle"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 38,
+    "fields": {
+      "name": "Can change video subtitle",
+      "content_type": 10,
+      "codename": "change_videosubtitle"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 39,
+    "fields": {
+      "name": "Can delete video subtitle",
+      "content_type": 10,
+      "codename": "delete_videosubtitle"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 40,
+    "fields": {
+      "name": "Can view video subtitle",
+      "content_type": 10,
+      "codename": "view_videosubtitle"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "9o6ny32irwzz4wfc7iukldxmdb8fd5ig",
+    "fields": {
+      "session_data": ".eJxVjLsOwjAMAP_FM4pwXiQd2fmGyq4dUkCt1LQT4t9RpQ6w3p3uDT1ta-23pks_CnSAcPplTMNTp13Ig6b7bIZ5WpeRzZ6YwzZzm0Vf16P9G1RqFTqw6D257LzTzAUthhJToKwu41mi1RxciglTCcUKB0IWJzyUS4pROcDnC7w9N4M:1vI7LO:W_9MNQRNtLuTTVjLlaRu_3GYzBsLgiqqOLMy54ByjGs",
+      "expire_date": "2025-11-23 15:28:42.612761+00:00"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "bi00wo0zzps92h5divrgtv00xo81zzbf",
+    "fields": {
+      "session_data": ".eJxVjEEOwiAQAP-yZ0OEpRR69N43NAvL2qqBpLQn499Nkx70OjOZN0y0b_O0t7xOC8MABi6_LFJ65nIIflC5V5Vq2dYlqiNRp21qrJxft7P9G8zUZhiA2Js-uC4lEg62N9n2jDo4rbVo6zCKZE_irMZwRWOiQQqebSedoA_w-QLbuDdY:1vLjGM:3eqIuIrdcKD7g_ue1vyONktfD9AOH4qli6hLMPbSaxI",
+      "expire_date": "2025-12-03 14:34:26.588502+00:00"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "1kwuegh7kqw276lhgq9khlq6r83p9ctq",
+    "fields": {
+      "session_data": ".eJxVjEEOwiAQAP-yZ0OEpRR69N43NAvL2qqBpLQn499Nkx70OjOZN0y0b_O0t7xOC8MABi6_LFJ65nIIflC5V5Vq2dYlqiNRp21qrJxft7P9G8zUZhiA2Js-uC4lEg62N9n2jDo4rbVo6zCKZE_irMZwRWOiQQqebSedoA_w-QLbuDdY:1vONeu:6-03MN4LpNkuCkvSM0DIjQilffnFolGzUeQhqn4G4Ts",
+      "expire_date": "2025-12-10 22:06:44.274649+00:00"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "ieywr2p63tqnl6wumyai99fwrpexpz51",
+    "fields": {
+      "session_data": ".eJxVjDsKwkAUAO_yalk2uOZtUtp7hvC-Jiq7kE8l3l0CKbSdGeYNA23rOGyLzcOk0EOC0y9jkqeVXeiDyr0GqWWdJw57Eg67hFtVe12P9m8w0jJCD2zq5hkxmwuJcacXsRjJLWFUbDkxepbGu0SYmjMpiyUTibntnODzBUSdOiU:1vOa58:Gw1Us6l8hjVXaH-SMQawMG7d6TY0xoU11t46-Cko428",
+      "expire_date": "2025-12-11 11:22:38.963735+00:00"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "m8fo66xb30qv6yymu3ux3yii6jb75fe3",
+    "fields": {
+      "session_data": ".eJxVjDsKwkAUAO_yalk2uOZtUtp7hvC-Jiq7kE8l3l0CKbSdGeYNA23rOGyLzcOk0EOC0y9jkqeVXeiDyr0GqWWdJw57Eg67hFtVe12P9m8w0jJCD2zq5hkxmwuJcacXsRjJLWFUbDkxepbGu0SYmjMpiyUTibntnODzBUSdOiU:1vP0pH:nzYFnlW41mFaChRgnHnMLpkApKoGO3ESV-1B28VdMT0",
+      "expire_date": "2025-12-12 15:56:03.741106+00:00"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "nqj5zbkkn0del3ixbvldm9q3aoybxxgs",
+    "fields": {
+      "session_data": ".eJxVjDsKwkAUAO_yalk2uOZtUtp7hvC-Jiq7kE8l3l0CKbSdGeYNA23rOGyLzcOk0EOC0y9jkqeVXeiDyr0GqWWdJw57Eg67hFtVe12P9m8w0jJCD2zq5hkxmwuJcacXsRjJLWFUbDkxepbGu0SYmjMpiyUTibntnODzBUSdOiU:1vQ04h:ygbOkTTSJtSdwGbZmWNVw9FEl-MwtoQwD35qIpo6xt8",
+      "expire_date": "2025-12-15 09:20:03.840650+00:00"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "hehpi33zwsvq7xa6cyisopwqarf7em8n",
+    "fields": {
+      "session_data": ".eJxVjMsOgjAQAP9lz6axtNsHR-98A9l2txY1kFA4Gf_dkHDQ68xk3jDSvtVxb7KOE0MPHVx-WaL8lPkQ_KD5vqi8zNs6JXUk6rRNDQvL63a2f4NKrUIPqWDK0RAXa9C7VLRG9FdygXLA5EQ4WBPRm1x8F3QxRqx1JMzBx4jw-QLzAzf2:1vWThZ:E95s3WDFTed6F9K0_cmvSWOYnPM3O5TYDUcIq5tJ3yU",
+      "expire_date": "2026-01-02 06:10:57.296263+00:00"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "!YzUvaPrJwgqyeLB3vKo2MvZdWyZJD6HwMEgabc9d",
+      "last_login": "2025-12-18 09:42:52.317409+00:00",
+      "is_superuser": true,
+      "username": "MMalopa",
+      "first_name": "MARTIN",
+      "last_name": "MALOPA",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-11-07 11:09:44.786761+00:00",
+      "email": "MARTIN.MALOPA@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-07 11:09:45.650916+00:00",
+      "updated_at": "2025-12-18 09:42:52.296746+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$XutfeQhiehZNt5QZ3GMG0s$OmnjOl7obfNNmREeiaj2TGfWpzhG+Nkdw4DemoQs9qE=",
+      "last_login": "2025-12-19 06:10:57.289303+00:00",
+      "is_superuser": false,
+      "username": "JMuro",
+      "first_name": "Jackline",
+      "last_name": "Muro",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-11-07 13:14:15.202293+00:00",
+      "email": "Jackline.Muro@cbtbank.co.tz",
+      "role": "head_of_risk",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-07 13:14:16.021250+00:00",
+      "updated_at": "2025-12-18 10:03:28.373931+00:00",
+      "groups": [],
+      "user_permissions": [
+        61,
+        62,
+        63,
+        64,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        57,
+        58,
+        59,
+        60,
+        53,
+        54,
+        55,
+        56,
+        33,
+        34,
+        35,
+        36,
+        41,
+        42,
+        43,
+        44,
+        37,
+        38,
+        39,
+        40
+      ]
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "password": "!ST9HF0LXaGpXHE6QGDKOaYaTyRnaq8CskU7EC2Gj",
+      "last_login": "2025-11-13 07:17:03.660382+00:00",
+      "is_superuser": false,
+      "username": "JMselle",
+      "first_name": "Julleth",
+      "last_name": "Mselle",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-11-07 13:14:16.033683+00:00",
+      "email": "Julleth.Mselle@cbtbank.co.tz",
+      "role": "risk_compliance_specialist",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-07 13:14:16.698270+00:00",
+      "updated_at": "2025-12-12 12:14:52.426637+00:00",
+      "groups": [],
+      "user_permissions": [
+        61,
+        62,
+        63,
+        64,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        57,
+        58,
+        59,
+        60,
+        53,
+        54,
+        55,
+        56,
+        33,
+        34,
+        35,
+        36,
+        41,
+        42,
+        43,
+        44,
+        37,
+        38,
+        39,
+        40
+      ]
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 4,
+    "fields": {
+      "password": "!M1LAFR4JoeazvExs7QElg1Fiomqwc1bjsu7g2PAl",
+      "last_login": "2025-12-12 05:34:32.538664+00:00",
+      "is_superuser": false,
+      "username": "JLugome",
+      "first_name": "JASMINI",
+      "last_name": "KUGOME",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-11-13 07:11:46.829166+00:00",
+      "email": "JASMINI.KUGOME@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-13 07:11:48.028798+00:00",
+      "updated_at": "2025-12-12 05:34:32.475593+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 5,
+    "fields": {
+      "password": "!MLd3Mu0uUZg3OtuhHPN2ms9IuLuvWWkgPFgVMxUA",
+      "last_login": "2025-12-13 06:32:57.422524+00:00",
+      "is_superuser": false,
+      "username": "ZMashaka",
+      "first_name": "ZENA",
+      "last_name": "MASHAKA",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-11-13 07:11:48.032413+00:00",
+      "email": "ZENA.MASHAKA@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-13 07:11:49.469410+00:00",
+      "updated_at": "2025-12-13 06:32:57.403854+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$c6ov5IuPltVwUC3Q0GxK3l$o2b2YYy6Pu+JK7lAgz4dY8QR06WsJMRaXw3B/f7Xv7c=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "SZimbamagoma",
+      "first_name": "Shufaa",
+      "last_name": "Zimbamagoma",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-11-13 07:11:49.471537+00:00",
+      "email": "Shufaa.Zimbamagoma@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-13 07:11:51.046335+00:00",
+      "updated_at": "2025-11-13 07:11:51.046366+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 7,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$35HNwIyCy199eyADgCPC0M$Bp+L8SkgS+Cte+dNPJYFtfhuI23qGl8d+uQqZDG1/7k=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "ALaswai",
+      "first_name": "Angel",
+      "last_name": "Laswai",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-11-13 07:11:51.049564+00:00",
+      "email": "Angel.Laswai@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-13 07:11:52.561437+00:00",
+      "updated_at": "2025-11-13 07:11:52.561452+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 8,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$KTInvcR16GesHUHCrYN5oz$CYXM5BhJv2mZ06jma2HxAFjqwv7V1UjvrC8+zOVvuXA=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "ALikongwe",
+      "first_name": "Abdallah",
+      "last_name": "Likongwe",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-11-13 07:11:52.563678+00:00",
+      "email": "Abdallah.Likongwe@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-13 07:11:53.941440+00:00",
+      "updated_at": "2025-11-13 07:11:53.941452+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 9,
+    "fields": {
+      "password": "!DvhdgOVsYXsKkBmDzs8KT1FsxUyc5HdmmkgzoEIw",
+      "last_login": "2025-12-13 08:55:55.211869+00:00",
+      "is_superuser": false,
+      "username": "CBayona",
+      "first_name": "CLEMENCE",
+      "last_name": "BAYONA",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-11-13 07:11:53.945735+00:00",
+      "email": "CLEMENCE.BAYONA@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-11-13 07:11:55.178081+00:00",
+      "updated_at": "2025-12-13 08:55:55.190283+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 10,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$GoBgBuVjETQ4HWPbQMPSov$SCwu5pAFGSB64cg30DrvlNcAvM3pqW2DHxp0WzCNmnM=",
+      "last_login": "2025-12-12 05:38:18.638170+00:00",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "Martin",
+      "last_name": "Malopa",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-12-10 09:41:07.721233+00:00",
+      "email": "admin@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-10 09:41:08.897922+00:00",
+      "updated_at": "2025-12-10 09:41:08.897943+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 11,
+    "fields": {
+      "password": "!iL8iNqyoulx8nL3Mywukr7EeLnEg6t7GmJm6N1gU",
+      "last_login": "2025-12-10 09:58:32.472949+00:00",
+      "is_superuser": false,
+      "username": "EPOND",
+      "first_name": "EMMANUEL",
+      "last_name": "POND",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-10 09:58:32.443418+00:00",
+      "email": "EMMANUEL.POND@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-10 09:58:32.447917+00:00",
+      "updated_at": "2025-12-10 09:58:32.447948+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 12,
+    "fields": {
+      "password": "!4HVxac1MDbRwN1MXZXTG44pclFJMorAuXFflOp1K",
+      "last_login": "2025-12-10 10:30:39.800098+00:00",
+      "is_superuser": false,
+      "username": "ESAJI",
+      "first_name": "ERICK",
+      "last_name": "SAJI",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-10 10:30:39.768804+00:00",
+      "email": "ERICK.SAJI@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-10 10:30:39.769465+00:00",
+      "updated_at": "2025-12-10 10:30:39.769478+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 13,
+    "fields": {
+      "password": "!z6K4Y4kPUQrQrGI3GcM3m35HFbTspelZ1V2yiOpa",
+      "last_login": "2025-12-18 09:44:23.326870+00:00",
+      "is_superuser": false,
+      "username": "ACHACHA",
+      "first_name": "ANTONY",
+      "last_name": "CHACHA",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-10 12:07:08.233294+00:00",
+      "email": "ANTONY.CHACHA@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-10 12:07:08.236338+00:00",
+      "updated_at": "2025-12-18 09:44:23.284315+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 14,
+    "fields": {
+      "password": "!tpUIxyLZ6QyPGfnRodVhdQ7G38mCtxZPGnaU8SR1",
+      "last_login": "2025-12-10 15:26:21.088628+00:00",
+      "is_superuser": false,
+      "username": "HMWITA",
+      "first_name": "Hamis",
+      "last_name": "Mwita",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-10 15:26:21.065757+00:00",
+      "email": "Hamis.Mwita@cbtbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-10 15:26:21.066336+00:00",
+      "updated_at": "2025-12-10 15:26:21.066355+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 15,
+    "fields": {
+      "password": "!9KcVWQUFvKhsEEwxfpj4uaGzaVR1Ata79m1jPfKI",
+      "last_login": "2025-12-18 10:15:18.678213+00:00",
+      "is_superuser": false,
+      "username": "JBIRAHI",
+      "first_name": "JOHANNES",
+      "last_name": "BIRAHI",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-18 10:15:18.643861+00:00",
+      "email": "JOHANNES.BIRAHI@crdbbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-18 10:15:18.644593+00:00",
+      "updated_at": "2025-12-18 10:15:18.644621+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 16,
+    "fields": {
+      "password": "!Lf4bb1rNxOOnM12cK8RHJzlerEz5lJjrzYAEaybK",
+      "last_login": "2025-12-18 10:23:40.664074+00:00",
+      "is_superuser": false,
+      "username": "IKOMBO",
+      "first_name": "ISSA",
+      "last_name": "KOMBO",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-18 10:23:40.636110+00:00",
+      "email": "ISSA.KOMBO@crdbbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-18 10:23:40.637858+00:00",
+      "updated_at": "2025-12-18 10:23:40.637940+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 18,
+    "fields": {
+      "password": "!fzXBeGosdZpkxvEw6qUk95y7AbZYdI6tKDJBBgH3",
+      "last_login": "2025-12-18 14:44:56.232033+00:00",
+      "is_superuser": false,
+      "username": "SMAREGESI",
+      "first_name": "SHAABAN",
+      "last_name": "MAREGESI",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-12-18 14:44:56.201588+00:00",
+      "email": "SHAABAN.MAREGESI@crdbbank.co.tz",
+      "role": "banker",
+      "phone": "",
+      "department": "",
+      "created_at": "2025-12-18 14:44:56.202478+00:00",
+      "updated_at": "2025-12-18 14:44:56.202508+00:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 10,
+    "fields": {
+      "title": "INTRODUCTION TO AML,KYC AND CTF COURSE POWERED BY COOPBANK",
+      "description": "📖 Extended Course Description\r\n\r\nThis course provides an in-depth and practical understanding of Anti-Money Laundering (AML), Counter-Terrorism Financing (CFT), Know Your Customer (KYC), and Sanctions Compliance within the unique operational and regulatory context of the Co-operative Bank of Tanzania (COOPBANK).\r\n\r\nThe course is specifically structured to address the risk profile of cooperative and community-based banking, where customers often include SACCOS, AMCOS, farmer associations, SMEs, NGOs, informal business groups, rural enterprises, and individual members with limited financial footprints. These characteristics present heightened risks related to identity verification, source of funds assessment, cash-intensive transactions, group accounts, and third-party relationships, which this course thoroughly examines.\r\n\r\nParticipants will gain a comprehensive understanding of money laundering and terrorist financing typologies, including the placement, layering, and integration stages, and how these crimes exploit cooperative banking products such as savings accounts, loan disbursements, cash collections, group financing, agricultural proceeds, and cross-border transactions. The course further explores terrorist financing methods, emphasizing that illicit funds may originate from both criminal and legitimate sources, making detection more complex.\r\n\r\nA strong emphasis is placed on Tanzania’s AML/CFT legal and regulatory framework, including the Anti-Money Laundering Act, AML Regulations, Prevention of Terrorism Act, Bank of Tanzania Guidelines, and Financial Intelligence Unit (FIU) reporting requirements. Participants will understand how these laws translate into day-to-day operational responsibilities at branch and head office levels.\r\n\r\nThe course introduces and deepens understanding of the Risk-Based Approach (RBA), enabling staff to identify, assess, and mitigate AML/CFT risks across customer types, products, delivery channels, geographic locations, and transaction behavior. Detailed guidance is provided on the application of Simplified Due Diligence (SDD), Standard Due Diligence (CDD), and Enhanced Due Diligence (EDD), with practical examples relevant to cooperative banking customers and high-risk relationships such as Politically Exposed Persons (PEPs), NGOs, mining, casinos, cross-border entities, and sanctioned jurisdictions.\r\n\r\nParticipants will also be trained on customer onboarding and ongoing monitoring, including accurate customer identification and verification, beneficial ownership determination, source of funds/source of wealth analysis, and periodic KYC reviews. The course provides hands-on knowledge for identifying suspicious transactions and red flags, conducting proper customer engagement without tipping-off, and timely submission of Suspicious Transaction Reports (STRs) to the Money Laundering Reporting Officer (MLRO) and FIU.\r\n\r\nAdditionally, the course covers global and local sanctions regimes, including UN, OFAC, EU, and UK sanctions, and explains how sanctions obligations affect customer screening, transactions, trade finance, and correspondent banking relationships. Roles and responsibilities across the three lines of defense—business units, compliance, and internal audit—are clearly articulated to ensure effective governance and accountability.\r\n\r\nThe course concludes by emphasizing the serious consequences of AML/CFT non-compliance, including regulatory penalties, reputational damage, loss of correspondent banking relationships, personal liability for staff, and potential revocation of banking licenses. Through real-life case studies and Tanzanian regulatory enforcement examples, participants gain a clear appreciation of why AML/CFT compliance is a strategic and ethical obligation, not merely a regulatory requirement.\r\n\r\nBy the end of the course, participants will be fully equipped to protect the Co-operative Bank of Tanzania from financial crime risks, enhance regulatory compliance, strengthen customer trust, and support sustainable financial inclusion within Tanzania’s cooperative banking sector.",
+      "created_by": 2,
+      "is_published": true,
+      "passing_score": 80,
+      "thumbnail": "",
+      "completion_time_enabled": false,
+      "completion_time_limit": 0,
+      "created_at": "2025-12-19 06:26:55.680384+00:00",
+      "updated_at": "2025-12-19 06:26:55.680427+00:00"
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 9,
+    "fields": {
+      "title": "INTRODUCTION TO AML,KYC AND CTF COURSE POWERED BY COOPBANK",
+      "description": "📘 Course Title: Introduction to AML, KYC, and CTF\r\n*Powered by Co-operative Bank (Co-op Bank)\r\n\r\n🔍 Course Description:\r\nThe Introduction to AML, KYC, and CTF course powered by Co-op Bank is designed to equip learners with a practical understanding of the essential concepts, regulations, and processes that underpin modern financial compliance. This foundational program explores Anti-Money Laundering (AML), Know Your Customer (KYC), and Counter-Terrorism Financing (CTF) frameworks, providing participants with the skills needed to recognize risks, adhere to legal standards, and contribute to a secure financial ecosystem.\r\n\r\nThrough real-world case studies, regulatory insights, and Co-op Bank’s industry-driven best practices, learners gain hands-on knowledge of customer due diligence, risk assessment, transaction monitoring, and reporting obligations. The course empowers participants to understand how financial institutions safeguard the integrity of the financial system and prevent illicit activities.\r\n\r\n🎯 Who This Course Is For:\r\n\r\nBanking and financial services professionals\r\n\r\nStudents or early-career individuals exploring compliance or risk management\r\n\r\nProfessionals transitioning into compliance roles\r\n\r\nAnyone seeking foundational knowledge of AML, KYC, and CTF principles\r\n\r\n📚 Key Topics Covered:\r\n\r\nIntroduction to financial crime and global regulatory frameworks\r\n\r\nCore principles of AML, KYC, and CTF\r\n\r\nCustomer Due Diligence (CDD) and Enhanced Due Diligence (EDD)\r\n\r\nRisk profiling and risk-based approaches\r\n\r\nTransaction monitoring and suspicious activity reporting\r\n\r\nRole of financial institutions in combating financial crime\r\n\r\nCo-op Bank’s compliance standards and real-life case scenarios\r\n\r\n🏆 Learning Outcomes:\r\nBy the end of this course, learners will be able to:\r\n\r\nUnderstand the fundamentals of AML, KYC, and CTF regulations\r\n\r\nIdentify indicators of money laundering and terrorism financing\r\n\r\nApply due diligence procedures effectively in a banking environment\r\n\r\nDemonstrate awareness of regulatory responsibilities and reporting processes\r\n\r\nContribute to stronger compliance culture within financial institutions",
+      "created_by": 2,
+      "is_published": true,
+      "passing_score": 80,
+      "thumbnail": "",
+      "completion_time_enabled": false,
+      "completion_time_limit": 0,
+      "created_at": "2025-12-05 10:10:27.865159+00:00",
+      "updated_at": "2025-12-05 10:10:27.865229+00:00"
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 21,
+    "fields": {
+      "user": 18,
+      "course": 9,
+      "enrolled_at": "2025-12-18 14:45:40.797575+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 20,
+    "fields": {
+      "user": 15,
+      "course": 9,
+      "enrolled_at": "2025-12-18 10:17:21.137664+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 19,
+    "fields": {
+      "user": 9,
+      "course": 9,
+      "enrolled_at": "2025-12-12 14:31:54.704148+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 18,
+    "fields": {
+      "user": 10,
+      "course": 9,
+      "enrolled_at": "2025-12-12 05:47:40.446522+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 17,
+    "fields": {
+      "user": 14,
+      "course": 9,
+      "enrolled_at": "2025-12-10 15:26:33.484907+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 16,
+    "fields": {
+      "user": 5,
+      "course": 9,
+      "enrolled_at": "2025-12-10 13:57:38.838752+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 15,
+    "fields": {
+      "user": 13,
+      "course": 9,
+      "enrolled_at": "2025-12-10 12:07:29.814294+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 14,
+    "fields": {
+      "user": 1,
+      "course": 9,
+      "enrolled_at": "2025-12-10 07:17:14.483606+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "courses.enrollment",
+    "pk": 13,
+    "fields": {
+      "user": 4,
+      "course": 9,
+      "enrolled_at": "2025-12-08 08:59:39.510147+00:00",
+      "completed_at": null,
+      "is_completed": false,
+      "deadline": null
+    }
+  },
+  {
+    "model": "videos.interactivecourse",
+    "pk": 3,
+    "fields": {
+      "course": 10,
+      "title": "INTRODUCTION TO AML,KYC AND CTF COURSE POWERED BY COOPBANK",
+      "description": "📖 Extended Course Description\r\n\r\nThis course provides an in-depth and practical understanding of Anti-Money Laundering (AML), Counter-Terrorism Financing (CFT), Know Your Customer (KYC), and Sanctions Compliance within the unique operational and regulatory context of the Co-operative Bank of Tanzania (COOPBANK).\r\n\r\nThe course is specifically structured to address the risk profile of cooperative and community-based banking, where customers often include SACCOS, AMCOS, farmer associations, SMEs, NGOs, informal business groups, rural enterprises, and individual members with limited financial footprints. These characteristics present heightened risks related to identity verification, source of funds assessment, cash-intensive transactions, group accounts, and third-party relationships, which this course thoroughly examines.\r\n\r\nParticipants will gain a comprehensive understanding of money laundering and terrorist financing typologies, including the placement, layering, and integration stages, and how these crimes exploit cooperative banking products such as savings accounts, loan disbursements, cash collections, group financing, agricultural proceeds, and cross-border transactions. The course further explores terrorist financing methods, emphasizing that illicit funds may originate from both criminal and legitimate sources, making detection more complex.\r\n\r\nA strong emphasis is placed on Tanzania’s AML/CFT legal and regulatory framework, including the Anti-Money Laundering Act, AML Regulations, Prevention of Terrorism Act, Bank of Tanzania Guidelines, and Financial Intelligence Unit (FIU) reporting requirements. Participants will understand how these laws translate into day-to-day operational responsibilities at branch and head office levels.\r\n\r\nThe course introduces and deepens understanding of the Risk-Based Approach (RBA), enabling staff to identify, assess, and mitigate AML/CFT risks across customer types, products, delivery channels, geographic locations, and transaction behavior. Detailed guidance is provided on the application of Simplified Due Diligence (SDD), Standard Due Diligence (CDD), and Enhanced Due Diligence (EDD), with practical examples relevant to cooperative banking customers and high-risk relationships such as Politically Exposed Persons (PEPs), NGOs, mining, casinos, cross-border entities, and sanctioned jurisdictions.\r\n\r\nParticipants will also be trained on customer onboarding and ongoing monitoring, including accurate customer identification and verification, beneficial ownership determination, source of funds/source of wealth analysis, and periodic KYC reviews. The course provides hands-on knowledge for identifying suspicious transactions and red flags, conducting proper customer engagement without tipping-off, and timely submission of Suspicious Transaction Reports (STRs) to the Money Laundering Reporting Officer (MLRO) and FIU.\r\n\r\nAdditionally, the course covers global and local sanctions regimes, including UN, OFAC, EU, and UK sanctions, and explains how sanctions obligations affect customer screening, transactions, trade finance, and correspondent banking relationships. Roles and responsibilities across the three lines of defense—business units, compliance, and internal audit—are clearly articulated to ensure effective governance and accountability.\r\n\r\nThe course concludes by emphasizing the serious consequences of AML/CFT non-compliance, including regulatory penalties, reputational damage, loss of correspondent banking relationships, personal liability for staff, and potential revocation of banking licenses. Through real-life case studies and Tanzanian regulatory enforcement examples, participants gain a clear appreciation of why AML/CFT compliance is a strategic and ethical obligation, not merely a regulatory requirement.\r\n\r\nBy the end of the course, participants will be fully equipped to protect the Co-operative Bank of Tanzania from financial crime risks, enhance regulatory compliance, strengthen customer trust, and support sustainable financial inclusion within Tanzania’s cooperative banking sector.",
+      "content_type": "captivate",
+      "package_file": "interactive_courses/packages/2025/12/AMLKYC_COOPBANK_RISK_COURSE.zip",
+      "extracted_path": "interactive_courses/20251219_092655_INTRODUCTION_TO_AML_KYC_AND_CTF_COURSE_POWERED_BY_",
+      "entry_file": "index.html",
+      "duration_minutes": 21,
+      "total_slides": 24,
+      "resolution_width": 1084,
+      "resolution_height": 627,
+      "thumbnail": "",
+      "order_index": 5,
+      "is_active": true,
+      "created_at": "2025-12-19 06:26:57.581779+00:00",
+      "updated_at": "2025-12-19 06:26:57.581824+00:00",
+      "created_by": 2
+    }
+  },
+  {
+    "model": "quizzes.quizattempt",
+    "pk": 26,
+    "fields": {
+      "user": 9,
+      "course": 9,
+      "interactive_course": null,
+      "score": null,
+      "total_questions": 0,
+      "correct_answers": 0,
+      "passed": false,
+      "started_at": "2025-12-14 06:16:22.425338+00:00",
+      "completed_at": null,
+      "question_ids": []
+    }
+  },
+  {
+    "model": "quizzes.quizattempt",
+    "pk": 25,
+    "fields": {
+      "user": 9,
+      "course": 9,
+      "interactive_course": null,
+      "score": null,
+      "total_questions": 0,
+      "correct_answers": 0,
+      "passed": false,
+      "started_at": "2025-12-14 06:16:21.604630+00:00",
+      "completed_at": null,
+      "question_ids": []
+    }
+  },
+  {
+    "model": "quizzes.quizattempt",
+    "pk": 24,
+    "fields": {
+      "user": 9,
+      "course": 9,
+      "interactive_course": null,
+      "score": null,
+      "total_questions": 0,
+      "correct_answers": 0,
+      "passed": false,
+      "started_at": "2025-12-14 06:16:19.793246+00:00",
+      "completed_at": null,
+      "question_ids": []
+    }
+  }
+]

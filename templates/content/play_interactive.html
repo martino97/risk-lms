@@ -401,6 +401,11 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Video for this slide (if present) -->
+                        <div id="slideVideoContainer" class="mt-3" style="display:none;">
+                            <video id="slideVideo" width="100%" controls style="background: #000; border-radius: 5px;"></video>
+                            <div class="small text-muted mt-1">You must watch at least 98% to continue.</div>
+                        </div>
                     </div>
                 </div>
 
@@ -601,6 +606,81 @@
 <script src="{% static 'js/scorm_api.js' %}"></script>
 
 <script>
+// --- Video Progress Lock Logic ---
+// Placeholder: Array of video URLs for each slide (1-based index)
+// Replace these URLs with your actual video URLs for each slide
+const slideVideoUrls = [
+    null, // index 0 unused (slides start at 1)
+    'URL_TO_VIDEO_1',
+    'URL_TO_VIDEO_2',
+    'URL_TO_VIDEO_3',
+    // ... add more URLs for each slide
+];
+
+function loadSlideVideo(videoUrl) {
+    const videoContainer = document.getElementById('slideVideoContainer');
+    const oldVideo = document.getElementById('slideVideo');
+    const nextBtn = document.getElementById('nextSlideBtn');
+    disableNavButtons(true);
+    // Remove previous event listeners by replacing the video element
+    const newVideo = oldVideo.cloneNode(true);
+    newVideo.removeAttribute('src');
+    newVideo.load();
+    oldVideo.parentNode.replaceChild(newVideo, oldVideo);
+    // Now newVideo is the fresh element
+    newVideo.currentTime = 0;
+    let unlocked = false;
+    canAdvance = false;
+    console.log('[LMS] loadSlideVideo called with videoUrl:', videoUrl);
+    if (!videoUrl) {
+        videoContainer.style.display = 'none';
+        nextBtn.disabled = true;
+        console.log('[LMS] No video for this slide. Hiding video container and disabling Next Slide.');
+        return;
+    }
+    videoContainer.style.display = 'block';
+    newVideo.src = videoUrl;
+    newVideo.load();
+    nextBtn.disabled = true;
+    newVideo.addEventListener('timeupdate', function unlockOnProgress() {
+        // Debug log for timeupdate
+        console.log('[LMS] timeupdate:', newVideo.currentTime, '/', newVideo.duration, 'unlocked:', unlocked);
+        if (newVideo.duration > 0 && newVideo.currentTime / newVideo.duration >= 0.98 && !unlocked) {
+            nextBtn.disabled = false;
+            unlocked = true;
+            canAdvance = true;
+            disableNavButtons(false);
+            console.log('[LMS] Video watched >= 98%. Next Slide enabled.');
+        }
+        if (newVideo.duration > 0 && newVideo.currentTime / newVideo.duration < 0.98 && unlocked) {
+            nextBtn.disabled = true;
+            unlocked = false;
+            canAdvance = false;
+            disableNavButtons(true);
+            console.log('[LMS] Video progress dropped below 98%. Next Slide disabled.');
+        }
+    });
+    newVideo.addEventListener('ended', function() {
+        nextBtn.disabled = false;
+        unlocked = true;
+        canAdvance = true;
+        disableNavButtons(false);
+        console.log('[LMS] Video ended. Next Slide enabled.');
+    });
+    // Ensure global reference is updated if needed elsewhere
+    window.slideVideo = newVideo;
+}
+
+// Disable or enable all navigation buttons except Next Slide
+function disableNavButtons(disable) {
+    // Example: disable all buttons with class 'nav-btn' except #nextSlideBtn
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.id !== 'nextSlideBtn') btn.disabled = disable;
+    });
+}
+
+// Example: Call loadSlideVideo('URL_TO_VIDEO') when a slide loads with a video
+// Integrate this with your slide loading logic as needed.
 /**
  * Hybrid Progress Tracking for Captivate Courses
  * 
@@ -686,8 +766,6 @@ function getFullscreenElement() {
 function startCourse() {
     courseLaunched = true;
     sessionStartTime = Date.now();
-    
-    // Hide launch section, show player
     document.getElementById('launchSection').style.display = 'none';
     document.getElementById('coursePlayerSection').style.display = 'block';
     
@@ -717,17 +795,15 @@ function startCourse() {
             setTimeout(function() {
                 goToCaptivateSlide(currentSlide);
                 console.log('[LMS] Navigating Captivate to resume slide:', currentSlide);
-            }, 1500); // Wait 1.5 seconds for Captivate to fully load
+                // Ensure unlock logic is applied for the resumed slide
+                startSlideTimer(slideVideoUrls[currentSlide] || null);
+            }, 1500);
+        } else {
+            // If not resuming, start unlock logic for slide 1
+            startSlideTimer(slideVideoUrls[currentSlide] || null);
         }
     };
-    
-    // Start time tracking
     startTimeTracking();
-    
-    // Start slide timer for current slide
-    startSlideTimer();
-    
-    // Update UI
     updateProgressUI();
     updateSlideDisplay(currentSlide);
 
@@ -745,13 +821,10 @@ function startCourse() {
 }
 
 // Start timer for current slide
-function startSlideTimer() {
-    // Clear existing timer
+function startSlideTimer(videoUrl) {
     if (slideTimer) {
         clearInterval(slideTimer);
     }
-    
-    // Reset button state
     const nextBtn = document.getElementById('nextSlideBtn');
     const lockBadge = document.getElementById('nextSlideLock');
     const statusText = document.getElementById('slideStatusText');
@@ -764,13 +837,7 @@ function startSlideTimer() {
         canAdvance = true;
         nextBtn.disabled = false;
         lockBadge.style.display = 'none';
-        
-        if (currentSlide < highestSlideReached) {
-            statusText.innerHTML = '<i class="fas fa-check-circle text-success"></i> Slide ' + currentSlide + ' completed. Click <strong>Next Slide</strong> to continue.';
-        } else {
-            // currentSlide == highestSlideReached - user is resuming from where they left off
-            statusText.innerHTML = '<i class="fas fa-play-circle text-info"></i> Resuming at slide ' + currentSlide + '. Click <strong>Next Slide</strong> when ready to continue.';
-        }
+        statusText.innerHTML = '<i class="fas fa-hourglass-half text-warning"></i> Watch the video. Next slide unlocks after 98% watched.';
         return;
     }
     

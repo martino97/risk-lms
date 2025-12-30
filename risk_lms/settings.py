@@ -1,3 +1,6 @@
+# Session timeout: expire after 5 minutes (300 seconds) of inactivity
+SESSION_COOKIE_AGE = 300  # 5 minutes
+SESSION_SAVE_EVERY_REQUEST = True
 """
 Django settings for Risk LMS project.
 Co-operative Bank of Tanzania PLC - Risk Department LMS
@@ -87,24 +90,26 @@ WSGI_APPLICATION = 'risk_lms.wsgi.application'
 # Get database settings from environment variables or use defaults
 DB_ENGINE = os.environ.get('DB_ENGINE', 'mssql')
 DB_NAME = os.environ.get('DB_NAME', 'risk_lms')
-DB_HOST = os.environ.get('DB_HOST', 'Martin\\SQLEXPRESS')
+DB_HOST = os.environ.get('DB_HOST', 'KCBLSMS-GATEWAY\\MSSQLSERVER02')
+DB_USER = os.environ.get('DB_USER', 'sa2')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'Pondrch@999')
 
 if DB_ENGINE == 'mssql':
-    # Microsoft SQL Server Configuration (Windows Authentication)
     DATABASES = {
         'default': {
             'ENGINE': 'mssql',
             'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
             'HOST': DB_HOST,
             'PORT': '',
-            'USER': '',
-            'PASSWORD': '',
             'OPTIONS': {
                 'driver': 'ODBC Driver 17 for SQL Server',
-                'extra_params': 'Trusted_Connection=yes;TrustServerCertificate=yes',
+                'TrustServerCertificate': 'yes',
             },
         }
     }
+
 elif DB_ENGINE == 'sqlite':
     # SQLite for local development/testing
     DATABASES = {
